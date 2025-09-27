@@ -235,6 +235,13 @@ const Layout = ({ children }) => {
       ]
     : []),
   { name: "All Blogs", path: "/blogs", icon: <FiBook />, desc: "Explore all posts" },
+  {
+          name: "Excel Manager",
+          path: "/excel",
+          icon: <FiFileText />, // or FiDatabase / FiUpload
+          desc: "Upload & manage Excel files",
+        },
+
   { name: "User Dashboard", path: "/user/dashboard", icon: <FiBook />, desc: "User Dashboard" },
   { name: "Contact Us", path: "/contact", icon: <FiPhone />, desc: "Get in touch" },
   { name: "About Us", path: "/about", icon: <FiInfo />, desc: "Learn about the project" },
