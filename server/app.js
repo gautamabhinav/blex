@@ -1,0 +1,288 @@
+import cookieParser from 'cookie-parser';
+config();
+import express from 'express';
+import { config } from 'dotenv';
+import cors from 'cors';
+import morgan from 'morgan';
+import errorMiddleware from './middlewares/error.middleware.js';
+import path from "path";
+// import { app, server } from "./utils/socket.js"
+
+
+// Import all routes
+import userRoutes from './routes/user.routes.js';
+import adminRoutes from './routes/admin.routes.js'
+import blogRoutes from './routes/blog.routes.js';
+import CategoryRoute from './routes/Category.routes.js';
+// import BlogLikeRoute from './routes/like.routes.js';
+import contactRoute from './routes/contact.routes.js';
+import statsRoute from './routes/stats.routes.js';
+import excelRoutes from './routes/upload.routes.js';
+import summaryRoutes from './routes/summary.routes.js';
+// import messageRoutes from './routes/message.routes.js'
+
+
+// import miscRoutes from './routes/miscellaneous.routes.js';
+
+
+const app = express();
+
+// Middlewares
+// Built-In
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Third-Party
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL],
+    credentials: true,
+  })
+);
+app.use(morgan('dev'));
+app.use(cookieParser());
+
+const _dirname = path.resolve();
+
+
+
+
+// Server Status Check Route
+app.get('/ping', (_req, res) => {
+  res.send('Pong');
+});
+
+
+
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/posts', blogRoutes);
+// app.use("/api/v1/messages", messageRoutes);
+app.use('/api/v1/excel', excelRoutes);
+app.use('/api/v1/ai/summary', summaryRoutes);
+app.use('/api/v1/contact', contactRoute);
+app.use('/api/v1/stats', statsRoute);
+// app.use('/api/v1', miscRoutes);
+
+// app.use('/api/v1/blogLikes', BlogLikeRoute);
+app.use('/api/v1/category', CategoryRoute);
+// app.use('/api/v1/likes', BlogLikeRoute);
+
+
+// Default catch all route - 404
+app.use((_req, res) => {
+  res.status(404).send('OOPS!!! 404 Page Not Found');
+});
+
+// Custom error handling middleware
+app.use(errorMiddleware);
+
+// app.use(express.static(path.join(_dirname, "/client/build")));
+// app.get('*', (_,res) => {
+//   res.sendFile(path.resolve(_dirname, "client", "build", "index.html"));
+// });
+
+export default app;
+
+
+
+
+
+// import cookieParser from 'cookie-parser';
+// import express from 'express';
+// import { config } from 'dotenv';
+// import cors from 'cors';
+// import morgan from 'morgan';
+// import path from 'path';
+// import errorMiddleware from './middlewares/error.middleware.js';
+
+// // Import all routes
+// import userRoutes from './routes/user.routes.js';
+// import adminRoutes from './routes/admin.routes.js';
+// import blogRoutes from './routes/blog.routes.js';
+// import CategoryRoute from './routes/Category.routes.js';
+// import contactRoute from './routes/contact.routes.js';
+// import statsRoute from './routes/stats.routes.js';
+// import excelRoutes from './routes/upload.routes.js';
+// import summaryRoutes from './routes/summary.routes.js';
+
+// import Affix from './models/affix.model.js'; // ✅ New: Post schema for realtime
+
+// // Init env and express
+// config();
+// const app = express();
+
+// // Middlewares
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(
+//   cors({
+//     origin: [process.env.FRONTEND_URL],
+//     credentials: true,
+//   })
+// );
+// app.use(morgan('dev'));
+// app.use(cookieParser());
+
+// const __dirname = path.resolve();
+
+// // Server Status Check Route
+// app.get('/ping', (_req, res) => {
+//   res.send('Pong');
+// });
+
+// // Routes
+// app.use('/api/v1/user', userRoutes);
+// app.use('/api/v1/admin', adminRoutes);
+// app.use('/api/v1/posts', blogRoutes);
+// app.use('/api/v1/excel', excelRoutes);
+// app.use('/api/v1/ai/summary', summaryRoutes);
+// app.use('/api/v1/contact', contactRoute);
+// app.use('/api/v1/stats', statsRoute);
+// app.use('/api/v1/category', CategoryRoute);
+
+// // Default catch all route - 404
+// app.use((_req, res) => {
+//   res.status(404).send('OOPS!!! 404 Page Not Found');
+// });
+
+// // Custom error handling middleware
+// app.use(errorMiddleware);
+
+// // 🔥 Realtime with Socket.IO
+// export const initRealtime = (server, io) => {
+//   io.on('connection', async (socket) => {
+//     console.log('Client connected:', socket.id);
+
+//     // Utility: get a post or create one if none exists
+//     const getAffix = async () => {
+//       let affix = await Affix.findOne();
+//       if (!affix) {
+//         affix = await Affix.create({ title: 'Realtime Demo Post' });
+//       }
+//       return affix;
+//     };
+
+//     const affix = await getAffix();
+//     socket.emit('updateStats', affix);
+
+//     // Like
+//     socket.on('likeAffix', async () => {
+//       const affix = await getAffix();
+//       affix.likes += 1;
+//       await affix.save();
+//       io.emit('updateStats', affix);
+//     });
+
+//     // View
+//     socket.on('viewAffix', async () => {
+//       const affix = await getAffix();
+//       affix.views += 1;
+//       await affix.save();
+//       io.emit('updateStats', affix);
+//     });
+
+//     // Comment
+//     socket.on('addComment', async (comment) => {
+//       const affix = await getAffix();
+//       affix.comments.push(comment);
+//       await affix.save();
+//       io.emit('updateStats', affix);
+//     });
+
+//     socket.on('disconnect', () => {
+//       console.log('Client disconnected:', socket.id);
+//     });
+//   });
+// };
+
+// export default app;
+
+
+// import express from 'express';
+// import cookieParser from 'cookie-parser';
+// import cors from 'cors';
+// import morgan from 'morgan';
+// import errorMiddleware from './middlewares/error.middleware.js';
+// import blogRoutes from './routes/blog.routes.js';
+// import userRoutes from './routes/user.routes.js';
+// import adminRoutes from './routes/admin.routes.js';
+// import CategoryRoute from './routes/Category.routes.js';
+// import contactRoute from './routes/contact.routes.js';
+// import statsRoute from './routes/stats.routes.js';
+// import excelRoutes from './routes/upload.routes.js';
+// import summaryRoutes from './routes/summary.routes.js';
+
+// const app = express();
+
+// // Middlewares
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(cors({ origin: [process.env.FRONTEND_URL], credentials: true }));
+// app.use(cookieParser());
+// app.use(morgan('dev'));
+
+// // Routes
+// app.use('/api/v1/user', userRoutes);
+// app.use('/api/v1/admin', adminRoutes);
+// app.use('/api/v1/posts', blogRoutes);
+// app.use('/api/v1/excel', excelRoutes);
+// app.use('/api/v1/ai/summary', summaryRoutes);
+// app.use('/api/v1/contact', contactRoute);
+// app.use('/api/v1/stats', statsRoute);
+// app.use('/api/v1/category', CategoryRoute);
+
+// // Default 404
+// app.use((_req, res) => res.status(404).send('OOPS!!! 404 Page Not Found'));
+
+// // Error middleware
+// app.use(errorMiddleware);
+
+// // --------------------
+// // Real-time setup
+// // --------------------
+
+// import Post from './models/blog.model.js';
+
+// export const initRealtime = (server, io) => {
+//   // const Blog = require('./models/blog.model.js'); // Make sure you have a blog model
+
+//   io.on('connection', (socket) => {
+//     console.log('🔌 User connected', socket.id);
+
+//     // Handle likes
+//     socket.on('likePost', async ({ postId }) => {
+//       const post = await Post.findById(postId);
+//       if (post) {
+//         post.likes += 1;
+//         await post.save();
+//         io.emit('postUpdated', { postId, likes: post.likes }); // Broadcast to all clients
+//       }
+//     });
+
+//     // Handle comments
+//     socket.on('addComment', async ({ postId, comment }) => {
+//       const post = await Post.findById(postId);
+//       if (post) {
+//         post.comments.push(comment);
+//         await post.save();
+//         io.emit('postUpdated', { postId, comments: post.comments });
+//       }
+//     });
+
+//     // Handle views
+//     socket.on('viewPost', async ({ postId }) => {
+//       const post = await Post.findById(postId);
+//       if (post) {
+//         post.views += 1;
+//         await post.save();
+//         io.emit('postUpdated', { postId, views: post.views });
+//       }
+//     });
+
+//     socket.on('disconnect', () => {
+//       console.log('❌ User disconnected', socket.id);
+//     });
+//   });
+// };
+
+// export default app;
