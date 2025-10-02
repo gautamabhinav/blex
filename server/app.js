@@ -1,126 +1,126 @@
-import cookieParser from 'cookie-parser';
-config();
-import express from 'express';
-import { config } from 'dotenv';
-import cors from 'cors';
-import morgan from 'morgan';
-import errorMiddleware from './middlewares/error.middleware.js';
-import path from "path";
-import { fileURLToPath } from "url";
-// import { app, server } from "./utils/socket.js"
+// import cookieParser from 'cookie-parser';
+// config();
+// import express from 'express';
+// import { config } from 'dotenv';
+// import cors from 'cors';
+// import morgan from 'morgan';
+// import errorMiddleware from './middlewares/error.middleware.js';
+// import path from "path";
+// import { fileURLToPath } from "url";
+// // import { app, server } from "./utils/socket.js"
 
 
-// Import all routes
-import userRoutes from './routes/user.routes.js';
-import adminRoutes from './routes/admin.routes.js'
-import blogRoutes from './routes/blog.routes.js';
-import categoryRoutes from './routes/category.routes.js';
-import blogLikeRoute from './routes/like.routes.js';
-import contactRoute from './routes/contact.routes.js';
-import statsRoute from './routes/stats.routes.js';
-import excelRoutes from './routes/upload.routes.js';
-import summaryRoutes from './routes/summary.routes.js';
-import commentRoutes from './routes/comment.routes.js';
-// import messageRoutes from './routes/message.routes.js'
+// // Import all routes
+// import userRoutes from './routes/user.routes.js';
+// import adminRoutes from './routes/admin.routes.js'
+// import blogRoutes from './routes/blog.routes.js';
+// import categoryRoutes from './routes/category.routes.js';
+// import blogLikeRoute from './routes/like.routes.js';
+// import contactRoute from './routes/contact.routes.js';
+// import statsRoute from './routes/stats.routes.js';
+// import excelRoutes from './routes/upload.routes.js';
+// import summaryRoutes from './routes/summary.routes.js';
+// import commentRoutes from './routes/comment.routes.js';
+// // import messageRoutes from './routes/message.routes.js'
 
 
-// import miscRoutes from './routes/miscellaneous.routes.js';
+// // import miscRoutes from './routes/miscellaneous.routes.js';
 
 
-const app = express();
+// const app = express();
 
-// Middlewares
-// Built-In
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-// Third-Party
-app.use(
-  cors({
-    origin: [process.env.FRONTEND_URL],
-    credentials: true,
-  })
-);
-app.use(morgan('dev'));
-app.use(cookieParser());
+// // Middlewares
+// // Built-In
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// // Third-Party
+// app.use(
+//   cors({
+//     origin: [process.env.FRONTEND_URL],
+//     credentials: true,
+//   })
+// );
+// app.use(morgan('dev'));
+// app.use(cookieParser());
 
-const _dirname = path.resolve();
+// const _dirname = path.resolve();
+
+// // const __filename = fileURLToPath(import.meta.url);
+// // const __dirname = path.dirname(__filename);
+
+// app.get("/", (_req, res) => {
+//   res.send("🚀 Blogging Platform API is running...");
+// });
+
+
+
+
+// // Server Status Check Route
+// app.get('/ping', (_req, res) => {
+//   res.send('Pong');
+// });
+
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
 
-app.get("/", (_req, res) => {
-  res.send("🚀 Blogging Platform API is running...");
-});
+// // Serve frontend in production
+// if (process.env.NODE_ENV === "production") {
+//   const frontendPath = path.resolve(__dirname, "../client/dist");
+//   app.use(express.static(frontendPath));
+
+//   app.get("*", (_req, res) => {
+//     res.sendFile(path.resolve(frontendPath, "index.html"));
+//   });
+// }
 
 
 
+// app.use('/api/v1/user', userRoutes);
+// app.use('/api/v1/admin', adminRoutes)
+// app.use('/api/v1/posts', blogRoutes);
+// // app.use("/api/v1/messages", messageRoutes);
+// app.use('/api/v1/comment', commentRoutes);
+// app.use('/api/v1/excel', excelRoutes);
+// app.use('/api/v1/ai/summary', summaryRoutes);
+// app.use('/api/v1/contact', contactRoute);
+// app.use('/api/v1/stats', statsRoute);
+// // app.use('/api/v1', miscRoutes);
 
-// Server Status Check Route
-app.get('/ping', (_req, res) => {
-  res.send('Pong');
-});
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve frontend in production
-if (process.env.NODE_ENV === "production") {
-  const frontendPath = path.resolve(__dirname, "../client/dist");
-  app.use(express.static(frontendPath));
-
-  app.get("*", (_req, res) => {
-    res.sendFile(path.resolve(frontendPath, "index.html"));
-  });
-}
+// // app.use('/api/v1/blogLikes', BlogLikeRoute);
+// app.use('/api/v1/category', categoryRoutes);
+// app.use('/api/v1/likes', blogLikeRoute);
 
 
+// // const path = require("path");
 
-app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/admin', adminRoutes)
-app.use('/api/v1/posts', blogRoutes);
-// app.use("/api/v1/messages", messageRoutes);
-app.use('/api/v1/comment', commentRoutes);
-app.use('/api/v1/excel', excelRoutes);
-app.use('/api/v1/ai/summary', summaryRoutes);
-app.use('/api/v1/contact', contactRoute);
-app.use('/api/v1/stats', statsRoute);
-// app.use('/api/v1', miscRoutes);
+// app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// app.use('/api/v1/blogLikes', BlogLikeRoute);
-app.use('/api/v1/category', categoryRoutes);
-app.use('/api/v1/likes', blogLikeRoute);
+// app.use( (_req, res) => {
+//   res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
+// });
 
-
-// const path = require("path");
-
-app.use(express.static(path.join(__dirname, "../client/dist")));
-
-app.use( (_req, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
-});
-
-// ------------------- Fallbacks -------------------
-app.use((_req, res) => {
-  res.status(404).send("OOPS!!! 404 Page Not Found");
-});
-
-
-
-// Default catch all route - 404
+// // ------------------- Fallbacks -------------------
 // app.use((_req, res) => {
-//   res.status(404).send('OOPS!!! 404 Page Not Found');
+//   res.status(404).send("OOPS!!! 404 Page Not Found");
 // });
 
-// Custom error handling middleware
-app.use(errorMiddleware);
 
-// app.use(express.static(path.join(_dirname, "/client/build")));
-// app.get('*', (_,res) => {
-//   res.sendFile(path.resolve(_dirname, "client", "build", "index.html"));
-// });
 
-export default app;
+// // Default catch all route - 404
+// // app.use((_req, res) => {
+// //   res.status(404).send('OOPS!!! 404 Page Not Found');
+// // });
+
+// // Custom error handling middleware
+// app.use(errorMiddleware);
+
+// // app.use(express.static(path.join(_dirname, "/client/build")));
+// // app.get('*', (_,res) => {
+// //   res.sendFile(path.resolve(_dirname, "client", "build", "index.html"));
+// // });
+
+// export default app;
 
 
 
@@ -325,3 +325,84 @@ export default app;
 // };
 
 // export default app;
+
+
+
+
+
+
+import cookieParser from "cookie-parser";
+import express from "express";
+import { config } from "dotenv";
+import cors from "cors";
+import morgan from "morgan";
+import errorMiddleware from "./middlewares/error.middleware.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Init env
+config();
+const app = express();
+
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL],
+    credentials: true,
+  })
+);
+app.use(morgan("dev"));
+app.use(cookieParser());
+
+// File path setup (ESM-safe __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Health check routes
+app.get("/", (_req, res) => res.send("🚀 Blogging Platform API is running..."));
+app.get("/ping", (_req, res) => res.send("Pong"));
+
+// ---------------- API Routes ----------------
+import userRoutes from "./routes/user.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import blogRoutes from "./routes/blog.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import blogLikeRoute from "./routes/like.routes.js";
+import contactRoute from "./routes/contact.routes.js";
+import statsRoute from "./routes/stats.routes.js";
+import excelRoutes from "./routes/upload.routes.js";
+import summaryRoutes from "./routes/summary.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
+
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/posts", blogRoutes);
+app.use("/api/v1/comment", commentRoutes);
+app.use("/api/v1/excel", excelRoutes);
+app.use("/api/v1/ai/summary", summaryRoutes);
+app.use("/api/v1/contact", contactRoute);
+app.use("/api/v1/stats", statsRoute);
+app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/likes", blogLikeRoute);
+
+// ---------------- Frontend (Production) ----------------
+if (process.env.NODE_ENV === "production") {
+  const frontendPath = path.resolve(__dirname, "../client/dist");
+  app.use(express.static(frontendPath));
+
+  // Serve React/Vite index.html for any other route
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
+  });
+}
+
+// ---------------- Error Handling ----------------
+app.use(errorMiddleware);
+
+app.use((_req, res) => {
+  res.status(404).send("OOPS!!! 404 Page Not Found");
+});
+
+export default app;
