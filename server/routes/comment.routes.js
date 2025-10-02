@@ -60,25 +60,26 @@ import {
   getCommentsForPost,
   addCommentToPost,
 } from '../controllers/comment.controller.js';
+import { userLimiter } from '../middlewares/ratelimiter.middleware.js';
 
 const router = Router();
 
 // Admin routes for managing comments
 router
   .route('/')
-  .get(getAllComments)
-  .post(isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), createComment);
+  .get(userLimiter, getAllComments)
+  .post(userLimiter, isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), createComment);
 
 router
   .route('/:id')
-  .get(getCommentById)
-  .put(isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), updateComment)
-  .delete(isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), deleteComment);
+  .get(userLimiter, getCommentById)
+  .put(userLimiter, isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), updateComment)
+  .delete(userLimiter, isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), deleteComment);
 
 // Public routes for comments on posts
 router
   .route('/posts/:blogId')
-  .get(getCommentsForPost)            // Get all comments for a post
-  .post(isLoggedIn, addCommentToPost); // Add a comment to a post as a logged-in user
+  .get(userLimiter, getCommentsForPost)            // Get all comments for a post
+  .post(userLimiter, isLoggedIn, addCommentToPost); // Add a comment to a post as a logged-in user
 
 export default router;

@@ -8,18 +8,19 @@ import {
   uploadExcel,
 } from "../controllers/upload.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.middleware.js";
+import { userLimiter } from "../middlewares/ratelimiter.middleware.js";
 
 const router = Router();
 
 // Excel file routes
 router
   .route("/")
-  .get(getAllExcelFiles) // anyone can fetch metadata
-  .post(isLoggedIn, authorizeRoles("ADMIN"), upload.single("excel"), uploadExcel);
+  .get(userLimiter, getAllExcelFiles) // anyone can fetch metadata
+  .post(userLimiter, isLoggedIn, authorizeRoles("ADMIN"), upload.single("excel"), uploadExcel);
 
 router
   .route("/:id")
-  .get(isLoggedIn, validateObjectId, getExcelFileById)
-  .delete(isLoggedIn, authorizeRoles("ADMIN"), validateObjectId, deleteExcelFileById);
+  .get(userLimiter, isLoggedIn, validateObjectId, getExcelFileById)
+  .delete(userLimiter, isLoggedIn,  authorizeRoles("ADMIN"), validateObjectId, deleteExcelFileById);
 
 export default router;

@@ -23,13 +23,13 @@ const router = Router();
 
 router
     .route('/')
-        .get(getAllCategory)
-        .post(upload.single('thumbnail'), addCategory);
+        .get(userLimiter, getAllCategory)
+        .post(userLimiter, upload.single('thumbnail'), addCategory);
 
 router
     .route('/:categoryid')
-        .get(isLoggedIn, showCategory)
-        .put(isLoggedIn, upload.single('thumbnil'), updateCategory)
-        .delete(isLoggedIn, deleteCategory);
+        .get(userLimiter, isLoggedIn, showCategory)
+        .put(userLimiter, isLoggedIn, upload.single('thumbnail'), updateCategory)
+        .delete(userLimiter, isLoggedIn, deleteCategory);
 
 export default router;

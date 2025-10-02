@@ -7,6 +7,7 @@ import {
 } from "../controllers/message.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import { arcjetProtection } from "../middleware/arcjet.middleware.js";
+import { userLimiter } from "../middlewares/ratelimiter.middleware.js";
 
 const router = express.Router();
 
@@ -14,9 +15,9 @@ const router = express.Router();
 // this is actually more efficient since unauthenticated requests get blocked by rate limiting before hitting the auth middleware.
 router.use(arcjetProtection, protectRoute);
 
-router.get("/contacts", getAllContacts);
-router.get("/chats", getChatPartners);
-router.get("/:id", getMessagesByUserId);
-router.post("/send/:id", sendMessage);
+router.get("/contacts", userLimiter, getAllContacts);
+router.get("/chats", userLimiter, getChatPartners);
+router.get("/:id", userLimiter, getMessagesByUserId);
+router.post("/send/:id", userLimiter, sendMessage);
 
 export default router;

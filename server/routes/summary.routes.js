@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { getsummary, getsummaryText } from "../controllers/summary.controller.js";
+import { userLimiter } from "../middlewares/ratelimiter.middleware.js";
 const router = Router();
 
 router
     .route('/')
-    .post(getsummary);    
+    .post(userLimiter, getsummary);    
 
 router
     .route('/text')
-    .post(getsummaryText);
+    .post(userLimiter, getsummaryText);
 
 export default router;
