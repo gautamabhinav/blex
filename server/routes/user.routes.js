@@ -38,7 +38,9 @@ router.post("/reset/:resetToken", resetPassword);
 router.post("/logout", logoutUser);
 router.get("/me",  isLoggedIn, getLoggedInUserDetails);
 router.post("/change-password", isLoggedIn, changePassword);
-router.put("/update/:id", isLoggedIn, upload.single("avatar"), updateUser);
+// router.put("/update/:id", isLoggedIn, upload.single("avatar"), updateUser);
+router.put("/update/:id", isLoggedIn, upload.single("avatar"), // <-- multer parses FormData
+  updateUser);
 router.put('/:id/role', isLoggedIn, updateUserRole);
 
 export default router;

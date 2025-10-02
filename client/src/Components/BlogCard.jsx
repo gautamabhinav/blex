@@ -1,10 +1,12 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const BlogCard = ({ data }) => {
   // console.log('data', data);
   const navigate = useNavigate();
 
+  // const comments = useSelector((state) => state.comments?.list || []);
   const getText = (value, max = 120) => {
     if (value === null || value === undefined) return "";
     if (typeof value === "string")
@@ -70,10 +72,10 @@ const BlogCard = ({ data }) => {
           <span className="text-yellow-500 font-bold">Category : </span>
           {categoryLabel}
         </p>
-        <p className="font-semibold">
+        {/* <p className="font-semibold">
           <span className="text-yellow-500 font-bold">Comments : </span>
-          {commentsCount}
-        </p>
+          {comments?.length}
+        </p> */}
       </div>
     </div>
   );

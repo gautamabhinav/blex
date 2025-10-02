@@ -226,12 +226,12 @@ const Layout = ({ children }) => {
           icon: <FiUser />,
           desc: "Manage site content",
         },
-        {
-          name: "Excel Manager",
-          path: "/excel",
-          icon: <FiFileText />, // or FiDatabase / FiUpload
-          desc: "Upload & manage Excel files",
-        },
+        // {
+        //   name: "Excel Manager",
+        //   path: "/excel",
+        //   icon: <FiFileText />, // or FiDatabase / FiUpload
+        //   desc: "Upload & manage Excel files",
+        // },
       ]
     : []),
   { name: "All Blogs", path: "/blogs", icon: <FiBook />, desc: "Explore all posts" },
@@ -280,7 +280,7 @@ const Layout = ({ children }) => {
           </button>
 
           <Link to="/" className="text-lg font-bold tracking-wide hover:opacity-90">
-            Curious Blog
+            XlBlog
           </Link>
         </div>
 

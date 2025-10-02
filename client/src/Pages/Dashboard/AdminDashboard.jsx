@@ -422,7 +422,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const { users = [], loading = false } = useSelector((state) => state.admin || {});
-  const { role: currentUserRole } = useSelector((state) => state.auth);
+  const auth = useSelector((state) => state.auth || {});
+  const currentUserRole = auth?.role || "";
   const myBlogs = useSelector((state) => state.blog.blogsData) || [];
 
   const [counts, setCounts] = useState({ blogs: 0, authors: 0, categories: 0 });

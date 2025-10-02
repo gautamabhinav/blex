@@ -1,170 +1,94 @@
-// import asyncHandler from "../middlewares/asyncHandler.middleware.js";
-// import Like from "../models/like.model.js";
-// import AppError from "../utils/AppError.js";
-
-// export const getAllLikes = asyncHandler(async(req,res, next) => {
-
-// const likes = await Like.find({});
-
-//     res.status(200).json({
-//         success: true,
-//         likes
-//     });
-// });
-
-// export const addLikes = asyncHandler(async(req,res, next) => {
-//     console.log(req.body);
-    
-//     const { userId, blogId } = req.body;
-
-//     if (!userId || !blogId) {
-//         return next(new AppError('User ID and Blog ID are required.', 404));
-//     }
-
-//     const like = new Like({ 
-//         user: userId,
-//         blogid: blogId
-//      });
-
-//     await like.save();
-
-//     res.status(201).json({
-//         success: true,
-//         message: "Like added successfully.",
-//         like
-//     });
-// });
-
-// // export const getLikebyid = asyncHandler(async(req,res, next) => {
-// //     const { id } = req.params;
-// //     const like = await Like.findById(id);
-
-// //     if (!like) {
-// //         return next(new AppError('Like not found.', 404));
-// //     }
-// //     res.status(200).json({
-// //         success: true,
-// //         like
-// //     });
-// // });
-
-// export const updateLike = asyncHandler(async(req, res, next) => {
-//     const { id } = req.params;
-//     console.log(req.body);
-//     const updatedData = req.body;
-
-//     const like = await Like.findByIdAndUpdate(id, updatedData, { new: true });
-//     if (!like) {
-//         return next(new AppError('Like not found.', 404));
-//     }
-
-//     res.status(200).json({
-//         success: true,
-//         message: "Like updated successfully",
-//         like
-//     });
-// });
-
-// export const deleteLike = asyncHandler(async(req, res, next) => {
-//     const { id } = req.params;
-//     const like = await Like.findByIdAndDelete(id);
-
-//     if (!like) {
-//         return next(new AppError('Like not found.', 404));
-//     }
-
-//     res.status(200).json({
-//         success: true,
-//         message: "Like deleted successfully"
-//     });
-// });
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-
-
-
 import asyncHandler from "../middlewares/asyncHandler.middleware.js";
 import Like from "../models/like.model.js";
-import AppError from "../utils/AppError.js";
 
-export const getAllLikes = asyncHandler(async (req, res, next) => {
-  const likes = await Like.find({});
-  res.status(200).json({
-    success: true,
-    likes,
-  });
-});
+// 👉 Like a post
+export const likePost = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id; // from isLoggedIn middleware
+    const { postId } = req.params;
 
-export const addLikes = asyncHandler(async (req, res, next) => {
-  console.log(req.body);
-
-  const { userId, blogId } = req.body;
-
-  if (!userId || !blogId) {
-    return next(new AppError("User ID and Blog ID are required.", 400)); // ✅ use 400
-  }
-
-  const like = new Like({
-    user: userId,
-    blogid: blogId,
-  });
-
-  await like.save();
-
-  res.status(201).json({
-    success: true,
-    message: "Like added successfully.",
-    like,
-  });
-});
-
-// Optional: only keep if you need it
-// export const getLikebyid = asyncHandler(async (req, res, next) => {
-//   const { likeid } = req.params;
-//   const like = await Like.findById(likeid);
-
-//   if (!like) {
-//     return next(new AppError("Like not found.", 404));
-//   }
-//   res.status(200).json({
-//     success: true,
-//     like,
-//   });
-// });
-
-export const updateLike = asyncHandler(async(req, res, next) => {
-    const { id } = req.params;
-    // console.log(req.body);
-    const updatedData = req.body;
-
-    const like = await Like.findByIdAndUpdate(id, updatedData, { new: true });
-    if (!like) {
-        return next(new AppError('Like not found.', 404));
+    const existingLike = await Like.findOne({ user: userId, blogid: postId });
+    if (existingLike) {
+      return res.status(400).json({ message: "Already liked" });
     }
 
-    res.status(200).json({
-        success: true,
-        message: "Like updated successfully",
-        like
-    });
-});
+    const like = new Like({ user: userId, blogid: postId });
+    await like.save();
 
-export const deleteLike = asyncHandler(async (req, res, next) => {
-  const { id } = req.params; // ✅ fix param name
-  const like = await Like.findByIdAndDelete(id);
-
-    console.log("Found like:", like);
-
-  if (!like) {
-    return next(new AppError("Like not found.", 404));
+    res.status(201).json({ message: "Post liked", like });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  res.status(200).json({
-    success: true,
-    message: "Like deleted successfully",
-  });
 });
+
+// 👉 Unlike a post
+export const unlikePost = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { postId } = req.params;
+
+    const like = await Like.findOneAndDelete({ user: userId, blogid: postId });
+
+    if (!like) return res.status(404).json({ message: "Like not found" });
+
+    res.json({ message: "Post unliked" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// 👉 Get total likes count for a post
+export const getLikesCount = asyncHandler(async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const count = await Like.countDocuments({ blogid: postId });
+
+    res.json({ postId, likes: count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+export const getUserLikeStatus = asyncHandler(async(req, res) => {
+  try {
+    const { postId, userId } = req.params;
+    const existingLike = await Like.findOne({ user: userId, blogid: postId });
+    if(existingLike) {
+      return res.status(200).json({ liked: true });
+    } else {
+      return res.status(200).json({ liked: false });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
+
+// Check like status for the currently authenticated user (uses isLoggedIn middleware)
+export const getUserLikeStatusAuth = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    const { postId } = req.params;
+    if (!userId) return res.status(200).json({ liked: false });
+
+    const existingLike = await Like.findOne({ user: userId, blogid: postId });
+    return res.status(200).json({ liked: !!existingLike });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get list of users who liked a post (populated user info)
+export const getLikesUsers = asyncHandler(async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const likes = await Like.find({ blogid: postId }).populate('user', 'fullName role avatar').lean().exec();
+    // map to user objects
+    const users = likes.map((l) => l.user).filter(Boolean);
+    res.status(200).json({ postId, users, count: users.length });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+

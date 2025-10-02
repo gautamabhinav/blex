@@ -21,8 +21,13 @@ export const isLoggedIn = asyncHandler(async (req, _res, next) => {
     return next(new AppError("Unauthorized, please login to continue", 401));
   }
 
+  const user = await User.findById(decoded.id);
+  if (!user) return next(new AppError("User not found", 404));
+
   // If all good store the id in req object, here we are modifying the request object and adding a custom field user in it
-  req.user = decoded;
+  // req.user = decoded;
+  req.user = user;
+
 
   // Do not forget to call the next other wise the flow of execution will not be passed further
   next();

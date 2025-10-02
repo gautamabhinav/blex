@@ -97,8 +97,8 @@ export const getAllBlogs = createAsyncThunk("/blog/get", async () => {
 
 // function to create a new blog
 export const createNewBlog = createAsyncThunk(
-  "/get/posts",
-  async (data) => {
+  "/blog/create",
+  async (data ,  { rejectWithValue }) => {
     // console.log(data);
     try {
       // creating the form data from user data
@@ -108,6 +108,7 @@ export const createNewBlog = createAsyncThunk(
       formData.append("title", data?.title);
       formData.append("content", data?.content);
       formData.append("author", data?.author);
+      formData.append("description", data?.description);
       formData.append("createdBy", data?.createdBy);
       formData.append("category", data?.category);
       formData.append("thumbnail", data?.thumbnail);
@@ -129,6 +130,41 @@ export const createNewBlog = createAsyncThunk(
     }
   }
 );
+
+// export const createNewBlog = createAsyncThunk(
+//   "/blog/create",
+//   async (data, { rejectWithValue }) => {
+//     try {
+//       const formData = new FormData();
+//       formData.append("title", data?.title);
+//       formData.append("content", data?.content);
+//       formData.append("author", data?.author);
+//       formData.append("createdBy", data?.createdBy);
+//       formData.append("category", data?.category);
+//       formData.append("thumbnail", data?.thumbnail);
+
+//       console.log("req.body:", req.body);
+//       console.log("req.file:", req.file);
+
+//       await axiosInstance.post("/posts", formData, {
+//         headers: { "Content-Type": "multipart/form-data" },
+//       });
+
+//       toast.promise(res, {
+//         loading: "Creating the blog...",
+//         success: "Blog created successfully",
+//         error: "Failed to create blog",
+//       });
+
+//       const response = await res;
+//       return response.data;
+//     } catch (error) {
+//       toast.error(error?.response?.data?.message || "Something went wrong");
+//       return rejectWithValue(error?.response?.data);
+//     }
+//   }
+// );
+
 
 // function to delete the blog
 export const deleteBlog = createAsyncThunk("/blog/delete", async (id) => {
@@ -192,126 +228,126 @@ export const updateBlog = createAsyncThunk("/blog/update", async (data) => {
   }
 });
 
-export const getAllComments = createAsyncThunk("/blog/get", async () => {
+// export const getAllComments = createAsyncThunk("/blog/get", async () => {
 
-  try {
-    const res = axiosInstance.get("/posts");
-    // console.log(res.data.blogs);
-    // console.log("API response:", res.data);
-
-
-    toast.promise(res, {
-      loading: "Loading blogs data...",
-      success: "blogs loaded successfully",
-      error: "Failed to get blogs",
-    });
-
-    const response = await res;
-    // console.log("API response getall:", response.data);
-
-    return response.data.posts;
-  } catch (error) {
-    toast.error(error?.response?.data?.message);
-  }
-});
+//   try {
+//     const res = axiosInstance.get("/posts");
+//     // console.log(res.data.blogs);
+//     // console.log("API response:", res.data);
 
 
-// function to create a new blog
-export const createNewComment = createAsyncThunk(
-  "/get/posts",
-  async (data) => {
-    // console.log(data);
-    try {
-      // creating the form data from user data
-      // title, content, author, createdBy
+//     toast.promise(res, {
+//       loading: "Loading blogs data...",
+//       success: "blogs loaded successfully",
+//       error: "Failed to get blogs",
+//     });
 
-      let formData = new FormData();
-      formData.append("title", data?.title);
-      formData.append("content", data?.content);
-      formData.append("author", data?.author);
-      formData.append("createdBy", data?.createdBy);
-      formData.append("category", data?.category);
-      formData.append("thumbnail", data?.thumbnail);
+//     const response = await res;
+//     // console.log("API response getall:", response.data);
 
-      const res = axiosInstance.post("/posts", formData);
+//     return response.data.posts;
+//   } catch (error) {
+//     toast.error(error?.response?.data?.message);
+//   }
+// });
 
-      toast.promise(res, {
-        loading: "Creating the blog...",
-        success: "Blog created successfully",
-        error: "Failed to create blog",
-      });
+
+// // function to create a new blog
+// export const createNewComment = createAsyncThunk(
+//   "/get/posts",
+//   async (data) => {
+//     // console.log(data);
+//     try {
+//       // creating the form data from user data
+//       // title, content, author, createdBy
+
+//       let formData = new FormData();
+//       formData.append("title", data?.title);
+//       formData.append("content", data?.content);
+//       formData.append("author", data?.author);
+//       formData.append("createdBy", data?.createdBy);
+//       formData.append("category", data?.category);
+//       formData.append("thumbnail", data?.thumbnail);
+
+//       const res = axiosInstance.post("/posts", formData);
+
+//       toast.promise(res, {
+//         loading: "Creating the blog...",
+//         success: "Blog created successfully",
+//         error: "Failed to create blog",
+//       });
 
       
-      const response = await res;
-      //  console.log("API response create:", response.data);
-      return response.data;
-    } catch (error) {
-      toast.error(error?.response?.data?.message);
-    }
-  }
-);
+//       const response = await res;
+//       //  console.log("API response create:", response.data);
+//       return response.data;
+//     } catch (error) {
+//       toast.error(error?.response?.data?.message);
+//     }
+//   }
+// );
 
-// function to delete the blog
-export const deleteComment = createAsyncThunk("/blog/delete", async (id) => {
-  try {
-    const res = axiosInstance.delete(`posts/${id}`);
+// // function to delete the blog
+// export const deleteComment = createAsyncThunk("/blog/delete", async (id) => {
+//   try {
+//     const res = axiosInstance.delete(`posts/${id}`);
 
-    toast.promise(res, {
-      loading: "Deleting the blog...",
-      success: "Blog deleted successfully",
-      error: "Failed to delete blog",
-    });
+//     toast.promise(res, {
+//       loading: "Deleting the blog...",
+//       success: "Blog deleted successfully",
+//       error: "Failed to delete blog",
+//     });
 
-    const response = await res;
+//     const response = await res;
 
-    return response.data;
-  } catch (error) {
-    toast.error(error?.response?.data?.message);
-  }
-});
+//     return response.data;
+//   } catch (error) {
+//     toast.error(error?.response?.data?.message);
+//   }
+// });
 
-// function to update the blog details
-export const updateComment = createAsyncThunk("/blog/update", async (data) => {
-  try {
+// // function to update the blog details
+// export const updateComment = createAsyncThunk("/blog/update", async (data) => {
+//   try {
     
-    // creating the form data from user data
-    // title, content, author, createdBy
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("content", data.content);
-    formData.append("createdBy", data.createdBy);
-    formData.append("author", data.author);
-    // backend is not allowing change of thumbnail
-    // if (data.thumbnail) {
-    //   formData.append("thumbnail", data.thumbnail);
-    // }
+//     // creating the form data from user data
+//     // title, content, author, createdBy
+//     const formData = new FormData();
+//     formData.append("title", data.title);
+//     formData.append("content", data.content);
+//     formData.append("createdBy", data.createdBy);
+//     formData.append("author", data.author);
+//     // backend is not allowing change of thumbnail
+//     // if (data.thumbnail) {
+//     //   formData.append("thumbnail", data.thumbnail);
+//     // }
 
-    const res = axiosInstance.put(`/posts/${data.id}`, {
-      // headers: {
-      //   "Content-Type": "multipart/form-data",
-      // },
+//     const res = axiosInstance.put(`/posts/${data.id}`, {
+//       // headers: {
+//       //   "Content-Type": "multipart/form-data",
+//       // },
 
-      title: data.title,
-      author: data.author,
-      createdBy: data.createdBy,
-      content: data.content,
+//       title: data.title,
+//       author: data.author,
+//       createdBy: data.createdBy,
+//       content: data.content,
 
-    });
+//     });
 
-    toast.promise(res, {
-      loading: "Updating the blog...",
-      success: "Blog updated successfully",
-      error: "Failed to update blog",
-    });
+//     toast.promise(res, {
+//       loading: "Updating the blog...",
+//       success: "Blog updated successfully",
+//       error: "Failed to update blog",
+//     });
 
-    const response = await res;
-    //  console.log("API response update:", response.data);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    toast.error(error?.response?.data?.message);
-  }
-});
+//     const response = await res;
+//     //  console.log("API response update:", response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.log(error);
+//     toast.error(error?.response?.data?.message);
+//   }
+// });
 
 
 
@@ -333,6 +369,19 @@ const blogSlice = createSlice({
         state.blogsData = [...action.payload];
       }
     });
+    // .addCase(createNewBlog)
+    // .addCase(createNewBlog.pending, (state) => {
+    //   state.blogsData = []; // optional: clear or set loading flag
+    // })
+    // .addCase(createNewBlog.rejected, (state) => {
+    //   state.blogsData = []; // stays empty if error
+    // })
+    // .addCase(createNewBlog.fulfilled, (state, action) => {
+    //   if (action.payload) {
+    //     // console.log(action.payload);
+    //     state.blogsData = [...action.payload];
+    //   }
+    // });
   },
 });
 

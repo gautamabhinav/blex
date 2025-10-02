@@ -14,7 +14,8 @@ const DisplayBlogs = () => {
   // for getting the data from location of previous component
   const courseDetails = useLocation().state;
   const { lectures } = useSelector((state) => state.lecture);
-  const { role } = useSelector((state) => state.auth);
+  const auth = useSelector((state) => state.auth || {});
+  const role = auth?.role || "";
 
   // to play the video accordingly
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);

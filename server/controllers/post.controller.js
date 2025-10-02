@@ -175,9 +175,9 @@ import cloudinary from "cloudinary";
 // Create a new post
 export const createPost = asyncHandler(async (req, res, next) => {
     // Expecting JSON body: { title, content, author, createdBy }
-    const { title, content, author, category, createdBy } = req.body;
+    const { title, content, author, description, category, createdBy } = req.body;
 
-    if (!title || !content || !author || !category || !createdBy) {
+    if (!title || !content || !author || !category || !description || !createdBy) {
         return next(new AppError('All fields are required', 400));
     }
 
@@ -218,6 +218,7 @@ export const createPost = asyncHandler(async (req, res, next) => {
         title,
         content,
         author,
+        description,
         category: categoryId,
         createdBy
     });
@@ -286,41 +287,41 @@ export const getPostbyid = asyncHandler(async (req, res, next) => {
     });
 });
 
-export const updatePost = asyncHandler(async (req, res, next) => {
-    console.log('Body:', req.body);
+// export const updatePost = asyncHandler(async (req, res, next) => {
+//     console.log('Body:', req.body);
 
 
-    const { id } = req.params;
-    const updates = req.body;
+//     const { id } = req.params;
+//     const updates = req.body;
 
-    console.log(updates);
+//     console.log(updates);
 
-    //  if (req.file) {
-    //     updates.thumbnail = req.file.path; // or cloudinary URL after upload
-    // }
+//     //  if (req.file) {
+//     //     updates.thumbnail = req.file.path; // or cloudinary URL after upload
+//     // }
 
 
-    // Ensure request body has data
-    if (!updates || typeof updates !== 'object' || Object.keys(updates).length === 0) {
-        return res.status(400).json({ message: 'No update data provided.' });
-    }
+//     // Ensure request body has data
+//     if (!updates || typeof updates !== 'object' || Object.keys(updates).length === 0) {
+//         return res.status(400).json({ message: 'No update data provided.' });
+//     }
 
-    const blogs = await Post.findByIdAndUpdate(
-        id,
-        { $set: updates },
-        { new: true, runValidators: true }
-    );
+//     const blogs = await Post.findByIdAndUpdate(
+//         id,
+//         { $set: updates },
+//         { new: true, runValidators: true }
+//     );
 
-    if (!blogs) {
-        return next(new AppError('Invalid Post id or Post not found.', 400));
-    }
+//     if (!blogs) {
+//         return next(new AppError('Invalid Post id or Post not found.', 400));
+//     }
 
-    res.status(200).json({
-        success: true,
-        message: 'Post updated successfully',
-        blogs,
-    });
-});
+//     res.status(200).json({
+//         success: true,
+//         message: 'Post updated successfully',
+//         blogs,
+//     });
+// });
 
 
 
@@ -351,6 +352,65 @@ export const updatePost = asyncHandler(async (req, res, next) => {
 //     post: updatedPost,
 // });
 // });
+
+
+export const updatePost = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  // Handle category conversion
+  if (updates.category) {
+    let categoryId;
+    const isValidObjectId = mongoose.Types.ObjectId.isValid;
+
+    if (typeof updates.category === "object" && updates.category._id) {
+      categoryId = updates.category._id;
+    } else if (typeof updates.category === "string") {
+      if (isValidObjectId(updates.category)) {
+        categoryId = updates.category;
+      } else {
+        const slugify = (s = '') =>
+          s.toString().trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+
+        const found = await Category.findOne({
+          $or: [
+            { name: new RegExp(`^${updates.category}$`, "i") },
+            { slug: updates.category }
+          ]
+        });
+
+        if (found) {
+          categoryId = found._id;
+        } else {
+          const createdCat = await Category.create({
+            name: updates.category,
+            slug: slugify(updates.category),
+          });
+          categoryId = createdCat._id;
+        }
+      }
+    }
+
+    updates.category = categoryId;
+  }
+
+  const updatedPost = await Post.findByIdAndUpdate(id, { $set: updates }, { 
+    new: true, 
+    runValidators: true 
+  });
+
+  if (!updatedPost) {
+    return next(new AppError("Invalid Post id or Post not found.", 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Post updated successfully",
+    post: updatedPost,
+  });
+});
+
+
 
 export const deletePost = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
@@ -398,8 +458,8 @@ export const addComment = asyncHandler(async (req, res, next) => {
         return next(new AppError('Post not found', 404));
     }
 
-    console.log('Fetched post:', blog);
-    console.log('Type of comments:', typeof blog.comments, 'Is array?', Array.isArray(blog.comments));
+    // console.log('Fetched post:', blog);
+    // console.log('Type of comments:', typeof blog.comments, 'Is array?', Array.isArray(blog.comments));
 
 
     if (!Array.isArray(blog.comments)) {

@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import CommentList from "../../Components/Comments/CommentList";
+import CommentForm from "../../Components/Comments/CommentForm";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axiosInstance from "../../Helper/axiosInstance";
 import { FiShare2 } from "react-icons/fi";
 import { AiOutlineLike } from "react-icons/ai";
 import { motion } from "framer-motion";
+import { fetchComments } from "../../Redux/commentSlice";
+import LikeButton from "../../Components/Likes/LikeButton";
 // import { getAllBlogs } from "../../Redux/blogSlice"; // ← uncomment if you have this
 
 const BlogDescription = () => {
@@ -15,14 +19,42 @@ const BlogDescription = () => {
   const { id: paramId } = useParams();
 
   const blogsData = useSelector((state) => state.blog?.blogsData || []);
+  const comments = useSelector((state) => state.comments?.list || []);
+  const likes = useSelector((state) => state.likes || []);
+
+  // console.log("BlogDescription comments from Redux:", comments);
+
+
+
+
+
   const blogFromStore =
     blogsData.find?.((b) => b?._id === location?.state?._id) || null;
 
   const [blog, setBlog] = useState(location?.state || blogFromStore || null);
-  const [comments, setComments] = useState([]);
-  const [commentText, setCommentText] = useState("");
-  const [replyTo, setReplyTo] = useState(null);
-  const [replyTextMap, setReplyTextMap] = useState({});
+
+  
+  // ❌ Remove this block completely:
+// useEffect(() => {
+//   dispatch(fetchComments());
+// }, [dispatch]);
+
+  // ✅ Add this instead:
+  // useEffect(() => {
+  //   const id = paramId || blog?._id || location?.state?._id;
+  //   if (id) {
+  //     dispatch(fetchComments(id));  // <-- pass blogId
+  //   }
+  // }, [paramId, blog?._id, location?.state?._id, dispatch]);
+
+  useEffect(() => {
+    const id = paramId || blog?._id || location?.state?._id;
+    if (id) {
+      dispatch(fetchComments(id));   // ✅ loads all comments for this blog
+    }
+  }, [paramId, blog?._id, location?.state?._id, dispatch]);
+  
+  // Comments are now managed by Redux (see CommentList/CommentForm)
   const [likesCount, setLikesCount] = useState(blog?.likes || 0);
   const [liked, setLiked] = useState(false);
 
@@ -42,28 +74,7 @@ const BlogDescription = () => {
     }
   }, [navigate]);
 
-  const buildTree = useCallback((items) => {
-    const map = new Map();
-    const roots = [];
-    items.forEach((it) => map.set(it._id, { ...it, replies: [] }));
-    items.forEach((it) => {
-      const parentId = it.parentId || it.parent;
-      parentId && map.has(parentId)
-        ? map.get(parentId).replies.push(map.get(it._id))
-        : roots.push(map.get(it._id));
-    });
-    return roots;
-  }, []);
 
-  const fetchComments = useCallback(async (id) => {
-    try {
-      const res = await axiosInstance.get(`/posts/${id}/comments`);
-      const flat = res?.data?.comments || [];
-      setComments(buildTree(flat));
-    } catch {
-      setComments([]);
-    }
-  }, [buildTree]);
 
   // ---------------- Effects ----------------
   useEffect(() => {
@@ -74,82 +85,26 @@ const BlogDescription = () => {
     const id = paramId || blog?._id || location?.state?._id;
     if (id) {
       if (!blog || blog._id !== id) loadBlog(id);
-      fetchComments(id);
+      // comments are loaded by CommentList (which dispatches fetchComments)
     } else {
       navigate("/blogs", { replace: true });
     }
-  }, [paramId, blog, location, loadBlog, fetchComments, navigate]);
+  }, [paramId, blog, location, loadBlog, navigate]);
 
   // ---------------- Actions ----------------
-  const doLike = async () => {
-    if (!blog?._id) return;
-    try {
-      const res = await axiosInstance.post(`/likes`, { postId: blog._id });
-      if (res?.data?.like) {
-        setLiked(true);
-        await loadBlog(blog._id);
-      }
-    } catch {
-      setLikesCount((c) => c + 1);
-    }
-  };
+  // const doLike = async () => {
+  //   if (!blog?._id) return;
+  //   try {
+  //     const res = await axiosInstance.post(`/likes/${blog._id}/like`);
+  //     if (res?.data) {
+  //       setLiked(true);
+  //       await loadBlog(blog._id);
+  //     }
+  //   } catch {
+  //     setLikesCount((c) => c + 1);
+  //   }
+  // };
 
-  const submitComment = async () => {
-    if (!commentText.trim()) return;
-    try {
-      await axiosInstance.post(`/posts/${blog._id}/comments`, {
-        comment: commentText,
-        author: "Anonymous",
-      });
-      await fetchComments(blog._id);
-    } catch {
-      setComments((c) => [
-        {
-          _id: Date.now(),
-          comment: commentText,
-          author: "You",
-          createdAt: new Date().toISOString(),
-          replies: [],
-        },
-        ...c,
-      ]);
-    } finally {
-      setCommentText("");
-    }
-  };
-
-  const submitReply = async (parentId) => {
-    const text = (replyTextMap[parentId] || "").trim();
-    if (!text) return;
-
-    const optimisticReply = {
-      _id: `r-${Date.now()}`,
-      comment: text,
-      author: "You",
-      createdAt: new Date().toISOString(),
-    };
-
-    setComments((prev) =>
-      prev.map((c) =>
-        c._id === parentId
-          ? { ...c, replies: [...(c.replies || []), optimisticReply] }
-          : c
-      )
-    );
-    setReplyTextMap((s) => ({ ...s, [parentId]: "" }));
-    setReplyTo(null);
-
-    try {
-      await axiosInstance.post(`/posts/${blog._id}/comments`, {
-        comment: text,
-        author: "Anonymous",
-        parentId,
-      });
-      await fetchComments(blog._id);
-    } catch {
-      // keep optimistic reply
-    }
-  };
 
   const copyLink = async () => {
     try {
@@ -159,70 +114,7 @@ const BlogDescription = () => {
   };
 
   // ---------------- Components ----------------
-  const ReplyInput = ({ parentId }) => (
-    <div className="mt-3 flex gap-2">
-      <input
-        value={replyTextMap[parentId] || ""}
-        onChange={(e) =>
-          setReplyTextMap((s) => ({ ...s, [parentId]: e.target.value }))
-        }
-        placeholder="Write a reply..."
-        className="flex-1 px-3 py-2 rounded bg-white/5"
-      />
-      <button
-        onClick={() => submitReply(parentId)}
-        className="px-3 py-2 rounded bg-indigo-600 text-black"
-      >
-        Reply
-      </button>
-      <button
-        onClick={() => setReplyTo(null)}
-        className="px-3 py-2 rounded bg-red-600"
-      >
-        Cancel
-      </button>
-    </div>
-  );
-
-  const CommentItem = ({ node, depth = 0 }) => (
-    <div className="p-3 bg-white/5 rounded" style={{ marginLeft: depth ? 8 : 0 }}>
-      <div className="flex items-center justify-between">
-        <div className="font-medium">{node.author || "Anonymous"}</div>
-        <div className="text-xs text-zinc-400">
-          {new Date(node.createdAt || Date.now()).toLocaleString()}
-        </div>
-      </div>
-
-      <div
-        className="mt-2 text-sm text-zinc-200"
-        dangerouslySetInnerHTML={{ __html: node.comment }}
-      />
-
-      <div className="mt-3 flex items-center gap-2">
-        <button
-          onClick={() => setReplyTo(node._id)}
-          className="text-sm text-indigo-300"
-        >
-          Reply
-        </button>
-        {node.replies?.length > 0 && (
-          <div className="text-xs text-zinc-400">
-            {node.replies.length} repl{node.replies.length > 1 ? "ies" : "y"}
-          </div>
-        )}
-      </div>
-
-      {replyTo === node._id && <ReplyInput parentId={node._id} />}
-
-      {node.replies?.length > 0 && (
-        <div className="mt-3 pl-4 space-y-2 border-l border-white/5">
-          {node.replies.map((r) => (
-            <CommentItem key={r._id} node={r} depth={depth + 1} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  // Comments UI moved to CommentForm and CommentList (Redux-powered)
 
   if (!blog) return null;
 
@@ -234,6 +126,7 @@ const BlogDescription = () => {
           <div className="flex flex-col md:flex-row gap-6">
             {/* Blog Content */}
             <div className="md:w-2/3">
+            
               {imgSrc ? (
                 <img
                   src={imgSrc}
@@ -257,15 +150,20 @@ const BlogDescription = () => {
                 </span>
               </div>
 
-              <div
+              {/* <div
                 className="prose max-w-none text-zinc-200 mb-6"
                 dangerouslySetInnerHTML={{
                   __html: blog.content || blog?.description || "",
                 }}
-              />
+              /> */}
+
+              <div className="prose max-w-none text-zinc-200 mb-6">
+                {blog.content || blog?.description || ""}
+              </div>
+
 
               <div className="flex items-center gap-3">
-                <motion.button
+                {/* <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={doLike}
                   className="flex items-center gap-2 px-3 py-2 rounded bg-white/5"
@@ -277,37 +175,26 @@ const BlogDescription = () => {
                   className="px-3 py-2 rounded bg-white/5 flex items-center gap-2"
                 >
                   <FiShare2 /> Share
-                </button>
+                </button> */}
+
+
+                <div className="flex items-center gap-3">
+                  <LikeButton postId={blog._id} />
+                  <button
+                    onClick={copyLink}
+                    className="px-3 py-2 rounded bg-white/5 flex items-center gap-2"
+                  >
+                    <FiShare2 /> Share
+                  </button>
+                </div>
               </div>
 
-              {/* Comments */}
+              {/* Comments (Redux-powered) */}
               <div className="mt-8">
                 <h3 className="text-xl font-semibold mb-3">Comments</h3>
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <input
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      placeholder="Write a comment..."
-                      className="flex-1 px-3 py-2 rounded bg-white/5"
-                    />
-                    <button
-                      onClick={submitComment}
-                      className="px-3 py-2 rounded bg-indigo-600 text-black"
-                    >
-                      Post
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {comments.length === 0 ? (
-                      <div className="text-zinc-400">No comments yet.</div>
-                    ) : (
-                      comments.map((c) => (
-                        <CommentItem key={c._id || c.createdAt} node={c} />
-                      ))
-                    )}
-                  </div>
+                <CommentForm blogId={blog?._id} />
+                <div className="mt-4">
+                  <CommentList blogId={blog?._id} />
                 </div>
               </div>
             </div>
@@ -318,14 +205,15 @@ const BlogDescription = () => {
                 <div className="text-sm text-zinc-300">Stats</div>
                 <div className="flex items-center gap-3 mt-2 text-white">
                   <span className="px-2 py-1 rounded bg-white/5">
-                    Views: {blog.views || 0}
+                    Views: {blog?.views || 0}
                   </span>
                   <span className="px-2 py-1 rounded bg-white/5">
-                    Likes: {likesCount}
+                    Likes: {likes?.likesByPost?.[blog._id] || 0}
                   </span>
-                  <span className="px-2 py-1 rounded bg-white/5">
-                    Comments: {comments.length}
-                  </span>
+                 <span className="px-2 py-1 rounded bg-white/5">
+                  Comments: {comments?.length || 0}
+                </span>
+
                 </div>
               </div>
 

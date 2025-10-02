@@ -11,14 +11,13 @@ const router = Router();
 router
     .route('/')
     .get(getAllPosts)
-    .post(upload.single('thumbnail'), authorizeRoles('ADMIN', 'SUPERADMIN'), createPost)
-
+    .post( isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), upload.single('thumbnail'), createPost);
 
 router
     .route('/:id')
     .get(isLoggedIn, getPostbyid)
     .put(isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), upload.single('thumbnail'), updatePost)
-    .delete(isLoggedIn, deletePost)
+    .delete(isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'), deletePost)
     .delete(isLoggedIn, deleteComment);
 
 router

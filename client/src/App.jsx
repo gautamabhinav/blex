@@ -31,6 +31,8 @@ import Denied from "./Pages/Denied";
 import ExcelPage from "./Pages/Excel/ExcelPage";
 import ChartPage from "./Pages/Excel/ChartViewer"
 import ChartViewer from "./Pages/Excel/ChartViewer";
+import CommentForm from "./Components/Comments/CommentForm";
+import CommentList from "./Components/Comments/CommentList";
 // import CreateBlog from "./Pages/Blog/CreateBlog";
 
 
@@ -83,6 +85,8 @@ const App = () => {
 
           {/* <Route path="/course/addlecture" element={<AddLecture />} /> */}
           <Route path="/blog/create" element={<CreateBlog />} />
+          {/* <Route path="/blog/create" element={<CommentForm />} />
+          <Route path="/blog/create" element={<CommentList />} /> */}
         </Route>
 
         <Route path="*" element={<NotFound />} />

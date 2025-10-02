@@ -107,13 +107,77 @@
 
 ////////////////////////////////////////////////////////////////
 
+// import path from "path";
+// import multer from "multer";
+// import fs from "fs";
+
+// const diskStorage = multer.diskStorage({
+//   destination: "uploads/",
+//   filename: (_req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
+
+// const upload = multer({
+//   storage: {
+//     _handleFile(req, file, cb) {
+//       const ext = path.extname(file.originalname).toLowerCase();
+
+//       if ([".xlsx", ".xls", ".xlsm", ".csv"].includes(ext)) {
+//       // if ([".pdf"].includes(ext)) {
+
+//         // 👉 Store Excel/CSV in memory
+//         const chunks = [];
+//         file.stream.on("data", (chunk) => chunks.push(chunk));
+//         file.stream.on("end", () => {
+//           const buffer = Buffer.concat(chunks);
+//           cb(null, {
+//             buffer,
+//             size: buffer.length,
+//             originalname: file.originalname,
+//             mimetype: file.mimetype,
+//           });
+//         });
+//       } else {
+//         // 👉 Use diskStorage for everything else
+//         diskStorage._handleFile(req, file, cb);
+//       }
+//     },
+
+//     _removeFile(_req, file, cb) {
+//       if (file.path) {
+//         // clean up if it was written to disk
+//         fs.unlink(file.path, cb);
+//       } else {
+//         cb(null);
+//       }
+//     },
+//   },
+//   limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+//   fileFilter: (_req, file, cb) => {
+//     const ext = path.extname(file.originalname).toLowerCase();
+//     if (
+//       ![".jpg", ".jpeg", ".webp", ".png", ".mp4", ".xlsx", ".xls", ".xlsm", ".csv"].includes(ext)
+//     ) {
+//       return cb(new Error(`Unsupported file type! ${ext}`), false);
+//     }
+//     cb(null, true);
+//   },
+// });
+
+// export default upload;
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 import path from "path";
+import fs from "fs";
 import multer from "multer";
 
 const diskStorage = multer.diskStorage({
   destination: "uploads/",
   filename: (_req, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, `${Date.now()}-${file.originalname}`); // unique filename
   },
 });
 
@@ -122,10 +186,8 @@ const upload = multer({
     _handleFile(req, file, cb) {
       const ext = path.extname(file.originalname).toLowerCase();
 
+      // 👉 Store Excel/CSV in memory
       if ([".xlsx", ".xls", ".xlsm", ".csv"].includes(ext)) {
-      // if ([".pdf"].includes(ext)) {
-
-        // 👉 Store Excel/CSV in memory
         const chunks = [];
         file.stream.on("data", (chunk) => chunks.push(chunk));
         file.stream.on("end", () => {
@@ -145,7 +207,6 @@ const upload = multer({
 
     _removeFile(_req, file, cb) {
       if (file.path) {
-        // clean up if it was written to disk
         fs.unlink(file.path, cb);
       } else {
         cb(null);
@@ -156,7 +217,17 @@ const upload = multer({
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (
-      ![".jpg", ".jpeg", ".webp", ".png", ".mp4", ".xlsx", ".xls", ".xlsm", ".csv"].includes(ext)
+      ![
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".png",
+        ".mp4",
+        ".xlsx",
+        ".xls",
+        ".xlsm",
+        ".csv",
+      ].includes(ext)
     ) {
       return cb(new Error(`Unsupported file type! ${ext}`), false);
     }
@@ -165,6 +236,7 @@ const upload = multer({
 });
 
 export default upload;
+
 
 
 // import path from "path";

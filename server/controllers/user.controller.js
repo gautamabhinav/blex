@@ -355,67 +355,171 @@ export const changePassword = asyncHandler(async (req, res, next) => {
  * @ROUTE @POST {{URL}}/api/v1/user/update/:id
  * @ACCESS Private (Logged in user only)
  */
-export const updateUser = asyncHandler(async (req, res, next) => {
-  // Destructuring the necessary data from the req object
-  const { fullName } = req.body;
-  const { id } = req.params;
+// export const updateUser = asyncHandler(async (req, res, next) => {
+//   // Destructuring the necessary data from the req object
+//   const { fullName } = req.body;
+//   const { id } = req.user._id;
 
-  const user = await User.findById(id);
+//   const user = await User.findById(id);
 
-  if (!user) {
-    return next(new AppError('Invalid user id or user does not exist'));
-  }
+//   if (!user) {
+//     return next(new AppError('Invalid user id or user does not exist'));
+//   }
 
-  if (fullName) {
-    user.fullName = fullName;
-  }
+//   if (fullName) {
+//     user.fullName = fullName;
+//   }
 
   
 
-  // Run only if user sends a file
-  if (req.file) {
-    // Deletes the old image uploaded by the user
-    await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+//   // Run only if user sends a file
+//   if (req.file) {
+//     // Deletes the old image uploaded by the user
+//     await cloudinary.v2.uploader.destroy(user.avatar.public_id);
 
-    try {
-      const result = await cloudinary.v2.uploader.upload(req.file.path, {
-        folder: 'blog', // Save files in a folder named blog
-        width: 250,
-        height: 250,
-        gravity: 'faces', // This option tells cloudinary to center the image around detected faces (if any) after cropping or resizing the original image
-        crop: 'fill',
-      });
+//     try {
+//       const result = await cloudinary.v2.uploader.upload(req.file.path, {
+//         folder: 'blog', // Save files in a folder named blog
+//         width: 250,
+//         height: 250,
+//         gravity: 'faces', // This option tells cloudinary to center the image around detected faces (if any) after cropping or resizing the original image
+//         crop: 'fill',
+//       });
 
-      // If success
-      if (result) {
-        // Set the public_id and secure_url in DB
-        user.avatar.public_id = result.public_id;
-        user.avatar.secure_url = result.secure_url;
+//       // If success
+//       if (result) {
+//         // Set the public_id and secure_url in DB
+//         user.avatar.public_id = result.public_id;
+//         user.avatar.secure_url = result.secure_url;
 
-        // After successful upload remove the file from local storage
-        fs.rm(`uploads/${req.file.filename}`);
-      }
-    } catch (error) {
-      return next(
-        new AppError(error || 'File not uploaded, please try again', 400)
-      );
-    }
-  }
+//         // After successful upload remove the file from local storage
+//         fs.rm(`uploads/${req.file.filename}`);
+//       }
+//     } catch (error) {
+//       return next(
+//         new AppError(error || 'File not uploaded, please try again', 400)
+//       );
+//     }
+//   }
 
-  // Save the user object
-  await user.save();
+//   // Save the user object
+//   await user.save();
 
-  res.status(200).json({
-    success: true,
-    message: 'User details updated successfully',
-  });
-});
+//   res.status(200).json({
+//     success: true,
+//     message: 'User details updated successfully',
+//   });
+// });
+
+// export const updateUser = asyncHandler(async (req, res, next) => {
+//   // Use the user from middleware
+//   const user = req.user;
+
+//   if (!user) {
+//     return next(new AppError('User not found', 404));
+//   }
+
+//   const { fullName } = req.body;
+
+//   if (fullName) {
+//     user.fullName = fullName;
+//   }
+
+//   // Run only if user sends a file
+//   if (req.file) {
+//     // Delete old image
+//     if (user.avatar?.public_id) {
+//       await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+//     }
+
+//     try {
+//       const result = await cloudinary.v2.uploader.upload(req.file.path, {
+//         folder: 'blog',
+//         width: 250,
+//         height: 250,
+//         gravity: 'faces',
+//         crop: 'fill',
+//       });
+
+//       if (result) {
+//         user.avatar = {
+//           public_id: result.public_id,
+//           secure_url: result.secure_url,
+//         };
+//         fs.rm(`uploads/${req.file.filename}`, () => {});
+//       }
+//     } catch (error) {
+//       return next(
+//         new AppError(error.message || 'File not uploaded, please try again', 400)
+//       );
+//     }
+//   }
+
+//   await user.save();
+
+//   res.status(200).json({
+//     success: true,
+//     message: 'User details updated successfully',
+//     user, // optionally return the updated user
+//   });
+// });
+
 
 // app.put('/api/users/:id/role', requireAuth, requireAdmin, async (req, res) => {
 //   const { role } = req.body;
 //   const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
 //   res.json(user);
 // });
+
+export const updateUser = asyncHandler(async (req, res, next) => {
+  // prefer :id from route, fallback to logged-in user
+  const id = req.params.id || req.user?._id;
+
+  if (!id) {
+    return next(new AppError("User ID is required", 400));
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    return next(new AppError("Invalid user id or user does not exist", 404));
+  }
+
+  const { fullName, userRole } = req.body;
+
+  if (fullName) user.fullName = fullName;
+  if (userRole) user.role = userRole;
+
+  if (req.file) {
+    if (user.avatar?.public_id) {
+      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+    }
+
+    const result = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: "blog",
+      width: 250,
+      height: 250,
+      gravity: "faces",
+      crop: "fill",
+    });
+
+    user.avatar = {
+      public_id: result.public_id,
+      secure_url: result.secure_url,
+    };
+
+    await fs.rm(`uploads/${req.file.filename}`);
+  }
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "User details updated successfully",
+    user,
+  });
+});
+
+
 
 export const updateUserRole = asyncHandler(async (req, res, next) => {
   const { role } = req.body;

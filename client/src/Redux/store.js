@@ -7,6 +7,8 @@ import statSliceReducer from "../Redux/statSlice";
 import excelSliceReducer from "../Redux/excelSlice";
 import socketReducer from "../Redux/socketSlice"
 import aiReducer from "../Redux/aiSlice"
+import commentSliceReducer from "../Redux/commentSlice";
+import likeSliceReducer from "../Redux/likeSlice";
 
 const store = configureStore({
   reducer: {
@@ -15,7 +17,9 @@ const store = configureStore({
     blog: blogSliceReducer,
     excel: excelSliceReducer,
     chart: chartSliceReducer,
+    likes: likeSliceReducer,
     socket: socketReducer,
+    comments: commentSliceReducer,
     stat: statSliceReducer,
     ai: aiReducer, 
   },

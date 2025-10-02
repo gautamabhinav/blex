@@ -73,17 +73,25 @@ const EditProfile = () => {
       const formData = new FormData();
       formData.append("fullName", data.fullName.trim());
       if (data.avatar) formData.append("avatar", data.avatar);
-      formData.append("userRole", data.userRole);
+      // formData.append("userRole", data.userRole);
 
-      const payload = [data.userID, formData];
-      const res = await dispatch(updateProfile(payload));
+      // dispatch expects an object { userId, formData }
+      try {
+        const res = await dispatch(
+          updateProfile({ userId: data.userID, formData })
+        ).unwrap();
 
-      if (res?.payload?.success) {
-        toast.success("Profile updated");
-        await dispatch(getUserData());
-        navigate("/user/profile");
-      } else {
-        toast.error(res?.payload?.message || "Failed to update profile");
+        if (res?.success) {
+          toast.success(res?.message || "Profile updated");
+          await dispatch(getUserData());
+          navigate("/user/profile");
+        } else {
+          toast.error(res?.message || "Failed to update profile");
+        }
+      } catch (err) {
+        // unwrap throws on rejection
+        const msg = err?.message || err || "Failed to update profile";
+        toast.error(msg);
       }
     } catch (err) {
       toast.error("An error occurred");

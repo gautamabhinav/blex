@@ -166,26 +166,48 @@ export const forgetPassword = createAsyncThunk(
 // );
 
 // NEW ✅ expects { userId, formData }
+// export const updateProfile = createAsyncThunk(
+//   "/user/update/profile",
+//   async ({ userId, formData }) => {
+//     try {
+//         let res = axiosInstance.put(`/user/update/${userId}`, formData);
+//         // dispatch(connectSocket());
+
+//       await toast.promise(res, {
+//         loading: "Updating...",
+//         success: (data) => data?.data?.message,
+//         error: "Failed to update profile",
+//       });
+
+//       res = await res;
+//       return res.data;
+//     } catch (error) {
+//       toast.error(error?.response?.data?.message);
+//     }
+//   }
+// );
+
 export const updateProfile = createAsyncThunk(
   "/user/update/profile",
-  async ({ userId, formData }) => {
+  async ({ userId, formData }, { rejectWithValue }) => {
     try {
-        let res = axiosInstance.put(`/user/update/${userId}`, formData);
-        // dispatch(connectSocket());
-
-      await toast.promise(res, {
-        loading: "Updating...",
-        success: (data) => data?.data?.message,
-        error: "Failed to update profile",
+      // Always await axios
+      let res = await axiosInstance.put(`/user/update/${userId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      res = await res;
+      // Toast with resolved data
+      toast.success(res?.data?.message || "Profile updated");
+
       return res.data;
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      const msg = error?.response?.data?.message || "Failed to update profile";
+      toast.error(msg);
+      return rejectWithValue(msg);
     }
   }
 );
+
 
 
 // function to reset the password

@@ -18,6 +18,11 @@ const commentSchema = new Schema({
         required: true,
         trim: true
     },
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: null,
+    },
 }, { timestamps: true })
 
 // const Comment = mongoose.model('Comment', commentSchema, 'comments')

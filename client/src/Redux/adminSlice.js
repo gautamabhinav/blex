@@ -16,7 +16,13 @@ export const fetchUsers = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const role = state.auth.role; // 'ADMIN' or 'SUPERADMIN'
+      // state.auth can be undefined during app startup; default to empty object
+      const auth = state.auth || {};
+      const role = auth.role; // 'ADMIN' or 'SUPERADMIN'
+      // console.log(role);
+
+      // SUPERADMIN sees all users including admins
+      
 
       // Admin sees only users
       const endpoint =

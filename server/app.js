@@ -13,12 +13,13 @@ import path from "path";
 import userRoutes from './routes/user.routes.js';
 import adminRoutes from './routes/admin.routes.js'
 import blogRoutes from './routes/blog.routes.js';
-import CategoryRoute from './routes/Category.routes.js';
-// import BlogLikeRoute from './routes/like.routes.js';
+import categoryRoutes from './routes/category.routes.js';
+import blogLikeRoute from './routes/like.routes.js';
 import contactRoute from './routes/contact.routes.js';
 import statsRoute from './routes/stats.routes.js';
 import excelRoutes from './routes/upload.routes.js';
 import summaryRoutes from './routes/summary.routes.js';
+import commentRoutes from './routes/comment.routes.js';
 // import messageRoutes from './routes/message.routes.js'
 
 
@@ -57,6 +58,7 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/admin', adminRoutes)
 app.use('/api/v1/posts', blogRoutes);
 // app.use("/api/v1/messages", messageRoutes);
+app.use('/api/v1/comment', commentRoutes);
 app.use('/api/v1/excel', excelRoutes);
 app.use('/api/v1/ai/summary', summaryRoutes);
 app.use('/api/v1/contact', contactRoute);
@@ -64,8 +66,8 @@ app.use('/api/v1/stats', statsRoute);
 // app.use('/api/v1', miscRoutes);
 
 // app.use('/api/v1/blogLikes', BlogLikeRoute);
-app.use('/api/v1/category', CategoryRoute);
-// app.use('/api/v1/likes', BlogLikeRoute);
+app.use('/api/v1/category', categoryRoutes);
+app.use('/api/v1/likes', blogLikeRoute);
 
 
 // Default catch all route - 404

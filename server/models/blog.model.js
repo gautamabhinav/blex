@@ -9,15 +9,15 @@ const postSchema = new Schema({
         type: String,
         required: true
     },
-    likes: { type: Number, default: 0 },
-    views: { type: Number, default: 0 },
-    comments: [
-      {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        text: String,
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
+    // likes: { type: Number, default: 0 },
+    // views: { type: Number, default: 0 },
+    // comments: [
+    //   {
+    //     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    //     text: String,
+    //     createdAt: { type: Date, default: Date.now },
+    //   },
+    // ],
     comments: {
         type: [
             {

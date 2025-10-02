@@ -129,3 +129,27 @@ export const getsummary = asyncHandler(async (req, res, next) => {
     );
   }
 });
+
+// Summarize arbitrary text (used by frontend for blog post summaries)
+export const getsummaryText = asyncHandler(async (req, res, next) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      return next(new AppError('No text provided for summary', 400));
+    }
+
+    // Prepare a concise summarization prompt
+    const prompt = `Summarize the following article in 3 concise bullet points and a one-line TL;DR. Keep language simple and clear:\n\n${String(text).slice(0, 10000)}`;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    const result = await model.generateContent(prompt);
+    const summary = result.response.text();
+
+    res.json({ summary });
+  } catch (error) {
+    console.error('Gemini text summary error:', error);
+    return next(
+      new AppError(error.message || 'Some error occurred while generating summary', 500)
+    );
+  }
+});
