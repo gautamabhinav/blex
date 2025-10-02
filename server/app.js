@@ -6,6 +6,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import errorMiddleware from './middlewares/error.middleware.js';
 import path from "path";
+import { fileURLToPath } from "url";
 // import { app, server } from "./utils/socket.js"
 
 
@@ -44,6 +45,13 @@ app.use(cookieParser());
 
 const _dirname = path.resolve();
 
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+app.get("/", (_req, res) => {
+  res.send("🚀 Blogging Platform API is running...");
+});
+
 
 
 
@@ -51,6 +59,20 @@ const _dirname = path.resolve();
 app.get('/ping', (_req, res) => {
   res.send('Pong');
 });
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve frontend in production
+if (process.env.NODE_ENV === "production") {
+  const frontendPath = path.resolve(__dirname, "../client/dist");
+  app.use(express.static(frontendPath));
+
+  app.get("*", (_req, res) => {
+    res.sendFile(path.resolve(frontendPath, "index.html"));
+  });
+}
 
 
 
@@ -70,10 +92,25 @@ app.use('/api/v1/category', categoryRoutes);
 app.use('/api/v1/likes', blogLikeRoute);
 
 
-// Default catch all route - 404
-app.use((_req, res) => {
-  res.status(404).send('OOPS!!! 404 Page Not Found');
+// const path = require("path");
+
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+app.use( (_req, res) => {
+  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
 });
+
+// ------------------- Fallbacks -------------------
+app.use((_req, res) => {
+  res.status(404).send("OOPS!!! 404 Page Not Found");
+});
+
+
+
+// Default catch all route - 404
+// app.use((_req, res) => {
+//   res.status(404).send('OOPS!!! 404 Page Not Found');
+// });
 
 // Custom error handling middleware
 app.use(errorMiddleware);
