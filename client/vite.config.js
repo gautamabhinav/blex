@@ -37,7 +37,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5014',
+        // target: 'http://localhost:5014',
+        target: 'https://blex-thlc.onrender.com',
         changeOrigin: true,
         secure: false,
         // Optional: remove '/api' prefix if needed
