@@ -12,7 +12,7 @@ import {
 } from "../controllers/user.controller.js";
 import { isLoggedIn } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/multer.middleware.js";
-import {  userLimiter } from "../middlewares/rateLimiter.middleware.js";
+import {  ipLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 
@@ -29,19 +29,19 @@ const router = Router();
 // router.put('/:id/role', userLimiter, isLoggedIn, updateUserRole);
 
 
-router.post("/register", userLimiter, upload.single("avatar"), registerUser);
-router.post("/login", userLimiter, upload.single("avatar"), loginUser);
-router.post("/reset", userLimiter, forgotPassword);
-router.post("/reset/:resetToken", userLimiter, resetPassword);
+router.post("/register", ipLimiter, upload.single("avatar"), registerUser);
+router.post("/login", ipLimiter, upload.single("avatar"), loginUser);
+router.post("/reset", ipLimiter, forgotPassword);
+router.post("/reset/:resetToken", ipLimiter, resetPassword);
 
 
-router.post("/logout", userLimiter, logoutUser);
-router.get("/me", userLimiter, isLoggedIn, getLoggedInUserDetails);
-router.post("/change-password", userLimiter, isLoggedIn, changePassword);
+router.post("/logout", ipLimiter, logoutUser);
+router.get("/me", ipLimiter, isLoggedIn, getLoggedInUserDetails);
+router.post("/change-password", ipLimiter, isLoggedIn, changePassword);
 // router.put("/update/:id", isLoggedIn, upload.single("avatar"), updateUser);
-router.put("/update/:id", userLimiter, isLoggedIn, upload.single("avatar"), // <-- multer parses FormData
+router.put("/update/:id", ipLimiter, isLoggedIn, upload.single("avatar"), // <-- multer parses FormData
   updateUser);
-router.put('/:id/role', userLimiter, isLoggedIn, updateUserRole);
+router.put('/:id/role', ipLimiter, isLoggedIn, updateUserRole);
 
 export default router;
 

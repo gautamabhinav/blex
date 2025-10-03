@@ -49,7 +49,7 @@ import http from "http";
 import { Server } from "socket.io";
 
 import app from "./app.js";
-import connectToDB from "./configs/dbConn.js";
+import connectToDB from "./src/configs/dbConn.js";
 
 const port = process.env.PORT || 10000;
 

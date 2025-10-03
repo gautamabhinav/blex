@@ -93,24 +93,32 @@ export const connectSocket = () => (dispatch, getState) => {
   const { auth } = getState();
   if (!auth.isLoggedIn || socket?.connected) return;
 
-  socket = io(BASE_URL, { withCredentials: true });
+  if (!socket) {
+    socket = io(BASE_URL, { withCredentials: true });
+  }
 
-  socket.on("connect", () => {
-    dispatch(setConnected(true));
-    dispatch(setSocketId(socket.id));
-  });
+  // Register listeners only once
+  if (!socket.hasListeners) {
+    socket.on("connect", () => {
+      dispatch(setConnected(true));
+      dispatch(setSocketId(socket.id));
+    });
 
-  socket.on("disconnect", () => {
-    dispatch(setConnected(false));
-    dispatch(setSocketId(null));
-  });
+    socket.on("disconnect", () => {
+      dispatch(setConnected(false));
+      dispatch(setSocketId(null));
+    });
 
-  socket.on("getOnlineUsers", (userIds) => {
-    dispatch(setOnlineUsers(userIds));
-  });
+    socket.on("getOnlineUsers", (userIds) => {
+      dispatch(setOnlineUsers(userIds));
+    });
+
+    socket.hasListeners = true; // custom flag
+  }
 
   socket.connect();
 };
+
 
 // Getter to access the raw socket outside Redux
 export const getSocket = () => socket;

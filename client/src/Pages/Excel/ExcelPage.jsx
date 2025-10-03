@@ -4240,7 +4240,6 @@ ChartJS.register(
 
 // import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { uploadExcel } from "../../../../server/controllers/upload.controller";
 // NOTE: do NOT import highcharts-3d at top-level — we load it dynamically below
 
 // Import at top-level (or dynamically like highcharts-3d)

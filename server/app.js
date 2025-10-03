@@ -336,7 +336,7 @@ import express from "express";
 import { config } from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import errorMiddleware from "./middlewares/error.middleware.js";
+import errorMiddleware from "./src/middlewares/error.middleware.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -365,17 +365,17 @@ app.get("/", (_req, res) => res.send("🚀 Blogging Platform API is running...")
 app.get("/ping", (_req, res) => res.send("Pong"));
 
 // ---------------- API Routes ----------------
-import userRoutes from "./routes/user.routes.js";
-import adminRoutes from "./routes/admin.routes.js";
-import blogRoutes from "./routes/blog.routes.js";
-import categoryRoutes from "./routes/category.routes.js";
-import blogLikeRoute from "./routes/like.routes.js";
-import contactRoute from "./routes/contact.routes.js";
-import statsRoute from "./routes/stats.routes.js";
-import excelRoutes from "./routes/upload.routes.js";
-import summaryRoutes from "./routes/summary.routes.js";
-import commentRoutes from "./routes/comment.routes.js";
-import notificationRoutes from "./routes/notification.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
+import adminRoutes from "./src/routes/admin.routes.js";
+import blogRoutes from "./src/routes/blog.routes.js";
+import categoryRoutes from "./src/routes/category.routes.js";
+import blogLikeRoute from "./src/routes/like.routes.js";
+import contactRoute from "./src/routes/contact.routes.js";
+import statsRoute from "./src/routes/stats.routes.js";
+import excelRoutes from "./src/routes/upload.routes.js";
+import summaryRoutes from "./src/routes/summary.routes.js";
+import commentRoutes from "./src/routes/comment.routes.js";
+import notificationRoutes from "./src/routes/notification.routes.js";
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/admin", adminRoutes);

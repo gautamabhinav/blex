@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { getsummary, getsummaryText } from "../controllers/summary.controller.js";
-import { userLimiter } from "../middlewares/rateLimiter.middleware.js";
+import { ipLimiter } from "../middlewares/rateLimiter.middleware.js";
 const router = Router();
 
 router
     .route('/')
-    .post(userLimiter, getsummary);    
+    .post(ipLimiter, getsummary);    
 
 router
     .route('/text')
-    .post(userLimiter, getsummaryText);
+    .post(ipLimiter, getsummaryText);
 
 export default router;

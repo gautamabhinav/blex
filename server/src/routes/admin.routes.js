@@ -3,7 +3,7 @@ import express from 'express';
 import { isAdminOrSuperAdmin, isLoggedIn } from '../middlewares/auth.middleware.js';
 import { authorizeRoles } from '../middlewares/auth.middleware.js';
 import { deleteUser, getAllUsers, updateUserRole } from '../controllers/admin.controller.js';
-import { userLimiter } from '../middlewares/rateLimiter.middleware.js';
+import { ipLimiter } from '../middlewares/rateLimiter.middleware.js';
 // import { getAllUsers, updateUserRole, deleteUser } from '../controllers/admin.controller.js';
 
 const router = express.Router();
@@ -13,12 +13,12 @@ router.use(isLoggedIn, authorizeRoles('ADMIN', 'SUPERADMIN'));
 // router.put("/users/:id/role", isAdminOrSuperAdmin,
 
 // Get all users
-router.get('/users', userLimiter, getAllUsers);
+router.get('/users', ipLimiter, getAllUsers);
 
 // Update role
-router.put('/users/:id/role', userLimiter, isAdminOrSuperAdmin, updateUserRole);
+router.put('/users/:id/role', ipLimiter, isAdminOrSuperAdmin, updateUserRole);
 
 // Delete user
-router.delete('/users/:id', userLimiter, deleteUser);
+router.delete('/users/:id', ipLimiter, deleteUser);
 
 export default router;
