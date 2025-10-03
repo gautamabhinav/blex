@@ -3,7 +3,7 @@ import express from 'express';
 import { isAdminOrSuperAdmin, isLoggedIn } from '../middlewares/auth.middleware.js';
 import { authorizeRoles } from '../middlewares/auth.middleware.js';
 import { deleteUser, getAllUsers, updateUserRole } from '../controllers/admin.controller.js';
-import { userLimiter } from '../middlewares/ratelimiter.middleware.js';
+import { userLimiter } from '../middlewares/rateLimiter.middleware.js';
 // import { getAllUsers, updateUserRole, deleteUser } from '../controllers/admin.controller.js';
 
 const router = express.Router();

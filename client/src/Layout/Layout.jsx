@@ -145,6 +145,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/authSlice";
 import { BsMoon, BsSun } from "react-icons/bs";
 import { FaChartSimple } from "react-icons/fa6";
+import toast, { Toaster } from "react-hot-toast";
+import { fetchNotifications, markNotificationRead } from '../Redux/notificationSlice';
+import { connectSocket, disconnectSocket } from '../Redux/socketSlice';
 
 const Layout = ({ children }) => {
   const dispatch = useDispatch();
@@ -153,23 +156,60 @@ const Layout = ({ children }) => {
 
   const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
   const role = useSelector((state) => state?.auth?.role);
-  const user = useSelector((state) => state?.auth?.user) || {};
+  // auth slice historically used `data` as the user object; support both shapes
+  const user = useSelector((state) => state?.auth?.data || state?.auth?.user) || {};
 
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
   const [query, setQuery] = useState("");
-  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
+  const [theme, setTheme] = useState(() => {
+    try {
+      const stored = localStorage.getItem("theme");
+      if (stored === "dark" || stored === "light") return stored;
+      // fall back to system preference
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+    } catch (e) {
+      // ignore
+    }
+    return "light"; // default to light for broader compatibility
+  });
 
   const firstLinkRef = useRef(null);
   const searchRef = useRef(null);
+  const notifications = useSelector((state) => state?.notifications) || { list: [], unreadCount: 0 };
+  const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
-    // initialize theme
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
+    // initialize theme and persist
+    try {
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+      localStorage.setItem("theme", theme);
+      // set meta color-scheme for some browsers
+      const meta = document.querySelector('meta[name="color-scheme"]') || document.createElement('meta');
+      meta.name = 'color-scheme';
+      meta.content = theme === 'dark' ? 'dark light' : 'light dark';
+      if (!document.head.contains(meta)) document.head.appendChild(meta);
+    } catch (err) {
+      console.warn('Theme init failed', err);
+    }
   }, [theme]);
 
   useEffect(() => {
+    // load notifications and (re)connect socket for logged-in users
+    if (isLoggedIn) {
+      dispatch(fetchNotifications());
+      dispatch(connectSocket());
+    } else {
+      dispatch(disconnectSocket());
+    }
+
     // keyboard shortcut: '/' focuses search
     const handler = (e) => {
       if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
@@ -179,11 +219,26 @@ const Layout = ({ children }) => {
       if (e.key === "Escape") {
         setIsOpen(false);
         setShowUserMenu(false);
+        setShowNotif(false);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [isLoggedIn]);
+
+  // listen for real-time incoming notifications
+  useEffect(() => {
+    if (!socket) return;
+    const onNew = (payload) => {
+      // refresh notifications list when a new notification arrives
+      dispatch(fetchNotifications());
+      try { toast.success("New notification"); } catch (e) { /* ignore */ }
+    };
+    socket.on("newNotification", onNew);
+    return () => {
+      socket.off("newNotification", onNew);
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (isOpen) {
@@ -304,9 +359,45 @@ const Layout = ({ children }) => {
             {theme === "dark" ? <BsSun size={18} /> : <BsMoon size={18} />}
           </button>
 
-          <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition" title="Notifications">
-            🔔
-          </button>
+          {/* Notification dropdown */}
+          <div className="relative">
+            <button onClick={() => setShowNotif((s) => !s)} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition relative" title="Notifications">
+              🔔
+              {notifications?.unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1 rounded-full">{notifications.unreadCount}</span>
+              )}
+            </button>
+
+            {showNotif && (
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 text-gray-800 p-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-semibold">Notifications</div>
+                  <button className="text-sm text-gray-500" onClick={() => dispatch(fetchNotifications())}>Refresh</button>
+                </div>
+                <div className="max-h-64 overflow-auto">
+                  {notifications?.list?.length === 0 ? (
+                    <div className="p-3 text-sm text-gray-500">No notifications</div>
+                  ) : (
+                    notifications.list.map((n) => (
+                      <div key={n._id} className={`p-2 rounded hover:bg-gray-100 flex items-start gap-2 ${((n.readBy||[]).some(r=>String(r.user)===String(user?._id||user?.id))) ? 'opacity-70' : ''}`}>
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{n.title}</div>
+                          <div className="text-xs text-gray-600">{n.message}</div>
+                          <div className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleString()}</div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {!((n.readBy||[]).some(r=>String(r.user)===String(user?._id||user?.id))) && (
+                            <button onClick={() => dispatch(markNotificationRead(n._id))} className="text-xs text-blue-600">Mark read</button>
+                          )}
+                          {n.link && <a href={n.link} className="text-xs text-yellow-500">Open</a>}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* user avatar / menu */}
           <div className="relative">
@@ -389,6 +480,8 @@ const Layout = ({ children }) => {
       <main className="flex-1"> {children} </main>
 
       <Footer />
+      {/* global toast container */}
+      <Toaster position="top-right" />
     </div>
   );
 };

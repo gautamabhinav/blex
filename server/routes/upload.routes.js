@@ -8,7 +8,7 @@ import {
   uploadExcel,
 } from "../controllers/upload.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.middleware.js";
-import { userLimiter } from "../middlewares/ratelimiter.middleware.js";
+import { userLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 

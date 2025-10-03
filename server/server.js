@@ -1,10 +1,10 @@
-import { v2 } from 'cloudinary';
+// import { v2 } from 'cloudinary';
 
 
-import app from './app.js';
-import connectToDB from './configs/dbConn.js';
+// import app from './app.js';
+// import connectToDB from './configs/dbConn.js';
 
-const port = process.env.PORT || 10000;
+// const port = process.env.PORT || 10000;
 
 // import path from "path";
 
@@ -12,11 +12,11 @@ const port = process.env.PORT || 10000;
 // const _dirname = path.resolve();
 
 // Cloudinary configuration
-v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// v2.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
 
 // Create an order
@@ -36,48 +36,58 @@ v2.config({
 //   res.sendFile(path.join(__dirname, "build", "index.html"));
 // });
 
-app.listen(port, async () => {
-  // Connect to DB
-  await connectToDB();
-  console.log(`App is running at http://localhost:${port}`);
+// app.listen(port, async () => {
+//   // Connect to DB
+//   await connectToDB();
+//   console.log(`App is running at http://localhost:${port}`);
+// });
+
+
+
+import { v2 as cloudinary } from "cloudinary";
+import http from "http";
+import { Server } from "socket.io";
+
+import app from "./app.js";
+import connectToDB from "./configs/dbConn.js";
+
+const port = process.env.PORT || 10000;
+
+// ✅ Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// ✅ Create HTTP server (Express wrapped)
+const server = http.createServer(app);
 
+// ✅ Attach Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // frontend dev URL
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
-// import http from 'http';
-// import { Server } from 'socket.io';
-// import { v2 as cloudinary } from 'cloudinary';
-// import app, { initRealtime } from './app.js';
-// import connectToDB from './configs/dbConn.js';
-// import mongoose from 'mongoose';
+// ✅ Socket.IO handlers
+io.on("connection", (socket) => {
+  console.log("✅ User connected:", socket.id);
 
-// const port = process.env.PORT || 10000;
+  socket.on("disconnect", () => {
+    console.log("❌ User disconnected:", socket.id);
+  });
 
-// // Cloudinary configuration
-// cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.CLOUDINARY_API_KEY,
-//   api_secret: process.env.CLOUDINARY_API_SECRET,
-// });
+  // Example: emit online users
+  socket.on("getOnlineUsers", () => {
+    io.emit("getOnlineUsers", [socket.id]); // broadcast
+  });
+});
 
-// // Connect to MongoDB
-// // connectToDB()
-//   // .then(() => console.log('✅ MongoDB connected'))
-//   // .catch((err) => console.error('MongoDB connection error:', err));
-
-
-//   connectToDB()
-
-// // Create HTTP server for Socket.IO
-// const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: { origin: process.env.FRONTEND_URL, credentials: true },
-// });
-
-// // Initialize real-time system
-// initRealtime(server, io);
-
-// // Start server
-// server.listen(port, () => {
-//   console.log(`🚀 App is running at http://localhost:${port}`);
-// });
+// ✅ Start server + connect DB
+server.listen(port, async () => {
+  await connectToDB();
+  console.log(`🚀 Server running at http://localhost:${port}`);
+});

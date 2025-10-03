@@ -1,34 +1,92 @@
+// import { createSlice } from "@reduxjs/toolkit";
+// import { io } from "socket.io-client";
+
+// const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+
+// let socket = null;
+
+// const initialState = {
+//   socket: null,
+//   onlineUsers: [],
+// };
+
+// const socketSlice = createSlice({
+//   name: "socket",
+//   initialState,
+//   reducers: {
+//     setSocket: (state, action) => {
+//       state.socket = action.payload;
+//     },
+//     setOnlineUsers: (state, action) => {
+//       state.onlineUsers = action.payload;
+//     },
+//     disconnectSocket: (state) => {
+//       if (state.socket?.connected) state.socket.disconnect();
+//       state.socket = null;
+//       state.onlineUsers = [];
+//     },
+//   },
+// });
+
+// export const { setSocket, setOnlineUsers, disconnectSocket } = socketSlice.actions;
+
+// // Thunk to connect socket
+// export const connectSocket = () => (dispatch, getState) => {
+//   const { auth } = getState();
+//   if (!auth.isLoggedIn || socket?.connected) return;
+
+//   socket = io(BASE_URL, { withCredentials: true });
+//   socket.connect();
+
+//   dispatch(setSocket(socket));
+
+//   socket.on("getOnlineUsers", (userIds) => {
+//     dispatch(setOnlineUsers(userIds));
+//   });
+// };
+
+// export default socketSlice.reducer;
+
+
 import { createSlice } from "@reduxjs/toolkit";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
-
+// Keep socket instance OUTSIDE redux state
 let socket = null;
+const BASE_URL = import.meta.env.MODE === "development" 
+  ? "http://localhost:5014" 
+  : "/";
 
 const initialState = {
-  socket: null,
+  connected: false,
   onlineUsers: [],
+  socketId: null, // optional: track the id, not the object
 };
 
 const socketSlice = createSlice({
   name: "socket",
   initialState,
   reducers: {
-    setSocket: (state, action) => {
-      state.socket = action.payload;
+    setConnected: (state, action) => {
+      state.connected = action.payload;
     },
     setOnlineUsers: (state, action) => {
       state.onlineUsers = action.payload;
     },
+    setSocketId: (state, action) => {
+      state.socketId = action.payload;
+    },
     disconnectSocket: (state) => {
-      if (state.socket?.connected) state.socket.disconnect();
-      state.socket = null;
+      if (socket?.connected) socket.disconnect();
+      socket = null;
+      state.connected = false;
       state.onlineUsers = [];
+      state.socketId = null;
     },
   },
 });
 
-export const { setSocket, setOnlineUsers, disconnectSocket } = socketSlice.actions;
+export const { setConnected, setOnlineUsers, setSocketId, disconnectSocket } = socketSlice.actions;
 
 // Thunk to connect socket
 export const connectSocket = () => (dispatch, getState) => {
@@ -36,13 +94,25 @@ export const connectSocket = () => (dispatch, getState) => {
   if (!auth.isLoggedIn || socket?.connected) return;
 
   socket = io(BASE_URL, { withCredentials: true });
-  socket.connect();
 
-  dispatch(setSocket(socket));
+  socket.on("connect", () => {
+    dispatch(setConnected(true));
+    dispatch(setSocketId(socket.id));
+  });
+
+  socket.on("disconnect", () => {
+    dispatch(setConnected(false));
+    dispatch(setSocketId(null));
+  });
 
   socket.on("getOnlineUsers", (userIds) => {
     dispatch(setOnlineUsers(userIds));
   });
+
+  socket.connect();
 };
+
+// Getter to access the raw socket outside Redux
+export const getSocket = () => socket;
 
 export default socketSlice.reducer;

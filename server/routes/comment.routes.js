@@ -60,7 +60,7 @@ import {
   getCommentsForPost,
   addCommentToPost,
 } from '../controllers/comment.controller.js';
-import { userLimiter } from '../middlewares/ratelimiter.middleware.js';
+import { userLimiter } from '../middlewares/rateLimiter.middleware.js';
 
 const router = Router();
 

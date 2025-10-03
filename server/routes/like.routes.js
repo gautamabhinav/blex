@@ -2,7 +2,7 @@ import { Router } from "express";
 import { isLoggedIn } from "../middlewares/auth.middleware.js";
 import { getLikesCount, getUserLikeStatus, likePost, unlikePost, getUserLikeStatusAuth } from "../controllers/like.controller.js";
 import { getLikesUsers } from "../controllers/like.controller.js";
-import { userLimiter } from "../middlewares/ratelimiter.middleware.js";
+import { userLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 

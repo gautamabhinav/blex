@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getsummary, getsummaryText } from "../controllers/summary.controller.js";
-import { userLimiter } from "../middlewares/ratelimiter.middleware.js";
+import { userLimiter } from "../middlewares/rateLimiter.middleware.js";
 const router = Router();
 
 router

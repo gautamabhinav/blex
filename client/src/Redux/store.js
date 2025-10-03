@@ -9,6 +9,7 @@ import socketReducer from "../Redux/socketSlice"
 import aiReducer from "../Redux/aiSlice"
 import commentSliceReducer from "../Redux/commentSlice";
 import likeSliceReducer from "../Redux/likeSlice";
+import notificationReducer from './notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     likes: likeSliceReducer,
     socket: socketReducer,
     comments: commentSliceReducer,
+  notifications: notificationReducer,
     stat: statSliceReducer,
     ai: aiReducer, 
   },

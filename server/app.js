@@ -375,6 +375,7 @@ import statsRoute from "./routes/stats.routes.js";
 import excelRoutes from "./routes/upload.routes.js";
 import summaryRoutes from "./routes/summary.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/admin", adminRoutes);
@@ -382,6 +383,7 @@ app.use("/api/v1/posts", blogRoutes);
 app.use("/api/v1/comment", commentRoutes);
 app.use("/api/v1/excel", excelRoutes);
 app.use("/api/v1/ai/summary", summaryRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 app.use("/api/v1/contact", contactRoute);
 app.use("/api/v1/stats", statsRoute);
 app.use("/api/v1/category", categoryRoutes);

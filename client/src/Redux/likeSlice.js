@@ -33,7 +33,7 @@ export const likePost = createAsyncThunk(
     try {
       // Define the promise for toast
       const promise = axiosInstance.post(`/likes/${postId}/like`);
-      console.log(promise);
+      // console.log(promise);
 
 
       // Attach toast to the promise
