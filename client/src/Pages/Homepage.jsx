@@ -884,13 +884,13 @@ const Homepage = () => {
                     </div>
                     <BlogCard data={b} />
                     <div className="mt-2 px-3 pb-3 flex items-center justify-between">
-                      <button
+                      {/* <button
                         onClick={() => alert(summarizePost(b))}
                         className="text-sm bg-white/5 px-3 py-1 rounded text-yellow-300 hover:bg-white/10"
                       >
                         Summarize
-                      </button>
-                      <div className="text-xs text-zinc-400">{b?.readingTime || '—'} read</div>
+                      </button> */}
+                      {/* <div className="text-xs text-zinc-400">{b?.readingTime || '—'} read</div> */}
                     </div>
                   </div>
                 </motion.div>
