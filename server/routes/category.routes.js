@@ -4,7 +4,7 @@
 
 import { Router } from "express";
 // import { addCategory, deleteCategory, getAllCategory, showCategory, updateCategory } from "../controllers/category.container.js";
-import { getAllCategory, addCategory, updateCategory,deleteCategory, showCategory } from "../controllers/Category.controller.js";
+import { getAllCategory, addCategory, updateCategory,deleteCategory, showCategory } from "../controllers/category.controller.js";
 import { isLoggedIn } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/multer.middleware.js";
 import { userLimiter } from "../middlewares/rateLimiter.middleware.js";
