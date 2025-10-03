@@ -51,16 +51,10 @@
 
 import { Router } from 'express';
 import { isLoggedIn, authorizeRoles } from '../middlewares/auth.middleware.js';
-import {
-  createComment,
-  deleteComment,
-  updateComment,
-  getAllComments,
-  getCommentById,
-  getCommentsForPost,
-  addCommentToPost,
-} from '../controllers/comment.controller.js';
+
 import { userLimiter } from '../middlewares/rateLimiter.middleware.js';
+import { addCommentToPost, createComment, deleteComment, getAllComments, getCommentById, getCommentsForPost, updateComment } from '../controllers/comment.controller.js';
+
 
 const router = Router();
 
