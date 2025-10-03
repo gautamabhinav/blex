@@ -161,16 +161,27 @@
 
 
 
-
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import { createClient } from 'redis';
 
+
+const redisUrl = process.env.REDIS_URL;
+
+if (!redisUrl) {
+  throw new Error("❌ REDIS_URL is not defined in environment variables");
+}
+
 // Create Redis client
 const redisClient = createClient({
+  url: redisUrl,
   socket: {
-    host: process.env.HOST || '127.0.0.1',
-    port: process.env.REDISPORT || 6379,
+    tls: true,                // Required for Upstash
+    tls: redisUrl.startsWith("rediss://"), // enable TLS only if needed
+    rejectUnauthorized: false, // Prevents SSL issues
+
+    // host: process.env.HOST || '127.0.0.1',
+    // port: process.env.REDISPORT || 6379,
   },
 });
 
@@ -241,6 +252,8 @@ export const userLimiter = rateLimit({
     });
   },
 });
+
+
 
 
 // Ensure Redis connection errors are handled
