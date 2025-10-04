@@ -13,6 +13,7 @@ const cookieOptions = {
   secure: process.env.NODE_ENV === 'production' ? true : false,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   httpOnly: true,
+  sameSite: 'None', // required for cross-site cookies
 };
 
 /**
@@ -149,20 +150,36 @@ export const loginUser = asyncHandler(async (req, res, next) => {
  * @ROUTE @POST {{URL}}/api/v1/user/logout
  * @ACCESS Public
  */
+// export const logoutUser = asyncHandler(async (_req, res, _next) => {
+//   // Setting the cookie value to null
+//   res.cookie('token', null, {
+//     secure: process.env.NODE_ENV === 'production' ? true : false,
+//     maxAge: 0,
+//     httpOnly: true,
+//   });
+
+//   // Sending the response
+//   res.status(200).json({
+//     success: true,
+//     message: 'User logged out successfully',
+//   });
+// });
+
 export const logoutUser = asyncHandler(async (_req, res, _next) => {
-  // Setting the cookie value to null
+  // Clear the cookie properly for cross-domain
   res.cookie('token', null, {
-    secure: process.env.NODE_ENV === 'production' ? true : false,
-    maxAge: 0,
+    secure: process.env.NODE_ENV === 'production', // true in production
     httpOnly: true,
+    sameSite: 'None', // important for cross-domain cookies
+    maxAge: 0,
   });
 
-  // Sending the response
   res.status(200).json({
     success: true,
     message: 'User logged out successfully',
   });
 });
+
 
 /**
  * @LOGGED_IN_USER_DETAILS

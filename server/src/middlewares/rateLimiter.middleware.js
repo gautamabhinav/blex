@@ -173,19 +173,38 @@ if (!redisUrl) {
 }
 
 // Create Redis client
-const redisClient = createClient({
-  url: redisUrl,
-  socket: {
-    tls: true,                // Required for Upstash
-    tls: redisUrl.startsWith("rediss://"), // enable TLS only if needed
-    rejectUnauthorized: false, // Prevents SSL issues
+// const redisClient = createClient({
+//   url: redisUrl,
+//   socket: {
+//     tls: true,                // Required for Upstash
+//     tls: redisUrl.startsWith("rediss://"), // enable TLS only if needed
+//     // rejectUnauthorized: false, // Prevents SSL issues
+//     rejectUnauthorized: true, // Prevents SSL issues
 
-    // host: process.env.HOST || '127.0.0.1',
-    // port: process.env.REDISPORT || 6379,
+
+//     // host: process.env.HOST || '127.0.0.1',
+//     // port: process.env.REDISPORT || 6379,
+//   },
+// });
+
+
+// import { createClient } from "redis";
+
+const redisClient = createClient({
+  url: process.env.REDIS_URL,
+  socket: {
+    tls: process.env.REDIS_URL.startsWith("rediss://"),
+    rejectUnauthorized: true, // only false if necessary
   },
 });
 
-await redisClient.connect(); // Must be awaited before using
+redisClient.on("error", (err) => console.error("Redis error:", err));
+
+await redisClient.connect();
+console.log("Redis connected ✅");
+
+
+// await redisClient.connect(); // Must be awaited before using
 
 // General rate limiter by IP
 export const ipLimiter = rateLimit({
