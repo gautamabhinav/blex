@@ -364,7 +364,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Health check routes
-app.get("/", (_req, res) => res.send("🚀 Blogging Platform API is running..."));
+app.get("/", (_req, res) => res.send("🚀 Xlblog API is running..."));
 app.get("/ping", (_req, res) => res.send("Pong"));
 
 // ---------------- API Routes ----------------
