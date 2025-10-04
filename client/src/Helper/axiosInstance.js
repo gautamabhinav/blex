@@ -6,7 +6,9 @@ import axios from "axios";
 // const BASE_URL = "http://localhost:5014/api/v1";
 
 // After (with proxy in place):
-const BASE_URL = "/api/v1";
+// const BASE_URL = "/api/v1";
+
+const BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
 // const BASE_URL = "https://lms-deploy-y4le.onrender.com/api/v1";
 
