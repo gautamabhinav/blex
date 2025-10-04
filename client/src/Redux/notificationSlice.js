@@ -66,7 +66,9 @@ export const fetchNotifications = createAsyncThunk(
   'notifications/fetch',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get('/notifications');
+      const res = await axiosInstance.get('/notifications',  {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

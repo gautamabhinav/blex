@@ -47,20 +47,24 @@
 
 // export default socketSlice.reducer;
 
-
 import { createSlice } from "@reduxjs/toolkit";
 import { io } from "socket.io-client";
 
 // Keep socket instance OUTSIDE redux state
 let socket = null;
-const BASE_URL = import.meta.env.MODE === "development" 
-  ? "http://localhost:5014" 
-  : "/";
+
+// ✅ Use backend Render URL in production
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5014"
+    : "https://blex-thlc.onrender.com"; // your backend URL
+
+socket = io(BASE_URL, { withCredentials: true });
 
 const initialState = {
   connected: false,
   onlineUsers: [],
-  socketId: null, // optional: track the id, not the object
+  socketId: null,
 };
 
 const socketSlice = createSlice({
@@ -86,18 +90,20 @@ const socketSlice = createSlice({
   },
 });
 
-export const { setConnected, setOnlineUsers, setSocketId, disconnectSocket } = socketSlice.actions;
+export const { setConnected, setOnlineUsers, setSocketId, disconnectSocket } =
+  socketSlice.actions;
 
-// Thunk to connect socket
 export const connectSocket = () => (dispatch, getState) => {
   const { auth } = getState();
   if (!auth.isLoggedIn || socket?.connected) return;
 
   if (!socket) {
-    socket = io(BASE_URL, { withCredentials: true });
+    socket = io(BASE_URL, {
+      withCredentials: true,
+      transports: ["websocket", "polling"], // ✅ ensure compatibility
+    });
   }
 
-  // Register listeners only once
   if (!socket.hasListeners) {
     socket.on("connect", () => {
       dispatch(setConnected(true));
@@ -113,14 +119,11 @@ export const connectSocket = () => (dispatch, getState) => {
       dispatch(setOnlineUsers(userIds));
     });
 
-    socket.hasListeners = true; // custom flag
+    socket.hasListeners = true;
   }
 
   socket.connect();
 };
 
-
-// Getter to access the raw socket outside Redux
 export const getSocket = () => socket;
-
 export default socketSlice.reducer;

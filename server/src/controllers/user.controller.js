@@ -9,12 +9,27 @@ import User from '../models/user.model.js';
 import sendEmail from '../utils/sendEmail.js';
 import AppError from '../utils/AppError.js';
 
+// const cookieOptions = {
+//   secure: process.env.NODE_ENV === 'production' ? true : false,
+//   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+//   httpOnly: true,
+//   sameSite: 'None', // required for cross-site cookies
+// };
+
 const cookieOptions = {
-  secure: process.env.NODE_ENV === 'production' ? true : false,
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   httpOnly: true,
-  sameSite: 'None', // required for cross-site cookies
+  secure: process.env.NODE_ENV === "production", // true in production
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
+
+// const cookieOptions = {
+//   secure: process.env.NODE_ENV === "production", // true in prod
+//   httpOnly: true,
+//   maxAge: 7 * 24 * 60 * 60 * 1000,
+//   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", 
+// };
+
 
 /**
  * @REGISTER
@@ -94,7 +109,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   user.password = undefined;
 
   // Setting the token in the cookie with name token along with cookieOptions
-  res.cookie('token', token, cookieOptions);
+  res.cookie('jwt', token, cookieOptions);
 
   // If all good send the response to the frontend
   res.status(201).json({
@@ -135,7 +150,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   user.password = undefined;
 
   // Setting the token in the cookie with name token along with cookieOptions
-  res.cookie('token', token, cookieOptions);
+  res.cookie('jwt', token, cookieOptions);
 
   // If all good send the response to the frontend
   res.status(200).json({
@@ -172,6 +187,7 @@ export const logoutUser = asyncHandler(async (_req, res, _next) => {
     httpOnly: true,
     sameSite: 'None', // important for cross-domain cookies
     maxAge: 0,
+    domain: '.xlblog-1.onrender.com', // optional, adjust to your domain
   });
 
   res.status(200).json({
