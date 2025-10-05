@@ -32,7 +32,8 @@ export default defineConfig({
   ],
    build: {
     // Increase the warning limit to 2 MB (2048 KB)
-    chunkSizeWarningLimit: 2048
+    chunkSizeWarningLimit: 2048,
+    outDir: "dist"
   },
   server: {
     proxy: {

@@ -294,7 +294,9 @@ export const createAccount = createAsyncThunk(
   "auth/signup",
   async (data, { rejectWithValue }) => {
     try {
-      let res = await axiosInstance.post("/user/register", data);
+      let res = await axiosInstance.post("/user/register" , data, {
+        withCredentials: true
+      });
 
       toast.success(res?.data?.message || "Account created successfully");
       return res.data;
@@ -311,7 +313,9 @@ export const login = createAsyncThunk(
   "auth/login",
   async (data, { rejectWithValue }) => {
     try {
-      let res = await axiosInstance.post("/user/login", data);
+      let res = await axiosInstance.post("/user/login", data, {
+        withCredentials: true
+      });
       toast.success(res?.data?.message || "Logged in successfully");
       return res.data;
     } catch (err) {
@@ -327,7 +331,9 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      let res = await axiosInstance.post("/user/logout");
+      let res = await axiosInstance.post("/user/logout", {
+        withCredentials : true
+      });
       toast.success(res?.data?.message || "Logged out successfully");
       return res.data;
     } catch (err) {
@@ -343,7 +349,9 @@ export const getUserData = createAsyncThunk(
   "auth/getUserData",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get("/user/me");
+      const res = await axiosInstance.get("/user/me" ,{
+        withCredentials : true
+      });
       return res.data;
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;
@@ -360,6 +368,7 @@ export const updateProfile = createAsyncThunk(
     try {
       const res = await axiosInstance.put(`/user/update/${userId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials : true
       });
       toast.success(res?.data?.message || "Profile updated");
       return res.data;
@@ -377,7 +386,9 @@ export const changePassword = createAsyncThunk(
   "/auth/changePassword",
   async (userPassword) => {
     try {
-      let res = axiosInstance.post("/user/change-password", userPassword);
+      let res = axiosInstance.post("/user/change-password", userPassword, {
+        withCredentials : true
+      });
       // dispatch(connectSocket());
 
       await toast.promise(res, {
@@ -402,7 +413,9 @@ export const forgetPassword = createAsyncThunk(
   "auth/forgetPassword",
   async (email) => {
     try {
-      let res = axiosInstance.post("/user/reset", { email });
+      let res = axiosInstance.post("/user/reset", { email }, {
+        withCredentials : true
+      });
       // dispatch(connectSocket());
 
       await toast.promise(res, {
@@ -428,6 +441,7 @@ export const resetPassword = createAsyncThunk("/user/reset", async (data) => {
   try {
     let res = axiosInstance.post(`/user/reset/${data.resetToken}`, {
       password: data.password,
+      withCredentials : true,
     });
     // dispatch(connectSocket());
 

@@ -409,7 +409,9 @@ export const fetchComments = createAsyncThunk(
   "comments/fetchComments",
   async (blogId, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get(`/comment/posts/${blogId}`);
+      const res = await axiosInstance.get(`/comment/posts/${blogId}`, {
+        withCredentials : true
+      });
       // console.log(res);
       return res.data.comments; // array of comments
     } catch (err) {
@@ -428,7 +430,9 @@ export const addComment = createAsyncThunk(
       const body = { comment };
       if (parentId) body.parentId = parentId;
 
-      const promise = axiosInstance.post(`/comment/posts/${blogId}`, body);
+      const promise = axiosInstance.post(`/comment/posts/${blogId}`, body, {
+        withCredentials : true
+      });
 
       toast.promise(promise, {
         loading: "Wait! Posting your comment...",
@@ -452,7 +456,9 @@ export const deleteComment = createAsyncThunk(
   "comments/deleteComment",
   async ({ commentId }, { rejectWithValue }) => {
     try {
-      await axiosInstance.delete(`/comment/${commentId}`);
+      await axiosInstance.delete(`/comment/${commentId}`, {
+        withCredentials: true
+      });
       return commentId;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

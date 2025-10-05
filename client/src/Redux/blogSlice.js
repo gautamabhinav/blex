@@ -75,7 +75,9 @@ const initialState = {
 export const getAllBlogs = createAsyncThunk("/blog/get", async () => {
 
   try {
-    const res = axiosInstance.get("/posts");
+    const res = axiosInstance.get("/posts", {
+      withCredentials : true
+    });
     // console.log(res.data.blogs);
     // console.log("API response:", res.data);
 
@@ -113,7 +115,9 @@ export const createNewBlog = createAsyncThunk(
       formData.append("category", data?.category);
       formData.append("thumbnail", data?.thumbnail);
 
-      const res = axiosInstance.post("/posts", formData);
+      const res = axiosInstance.post("/posts", formData, data, {
+        withCredentials : true
+      });
 
       toast.promise(res, {
         loading: "Creating the blog...",
@@ -169,7 +173,9 @@ export const createNewBlog = createAsyncThunk(
 // function to delete the blog
 export const deleteBlog = createAsyncThunk("/blog/delete", async (id) => {
   try {
-    const res = axiosInstance.delete(`posts/${id}`);
+    const res = axiosInstance.delete(`posts/${id}`, {
+      withCredentials : true
+    });
 
     toast.promise(res, {
       loading: "Deleting the blog...",
@@ -205,7 +211,8 @@ export const updateBlog = createAsyncThunk("/blog/update", async (data) => {
       // headers: {
       //   "Content-Type": "multipart/form-data",
       // },
-
+      
+      withCredentials : true,
       title: data.title,
       author: data.author,
       createdBy: data.createdBy,

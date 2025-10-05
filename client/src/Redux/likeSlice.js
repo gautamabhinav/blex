@@ -196,7 +196,9 @@ export const likePost = createAsyncThunk(
   "likes/likePost",
   async (postId, { rejectWithValue }) => {
     try {
-      const promise = axiosInstance.post(`/likes/${postId}/like`);
+      const promise = axiosInstance.post(`/likes/${postId}/like`, {
+        withCredentials: true
+      });
       const res = await toast.promise(promise, {
         loading: "Liking the post...",
         success: (res) => res?.data?.message || "Post liked!",
@@ -214,7 +216,9 @@ export const unlikePost = createAsyncThunk(
   "likes/unlikePost",
   async (postId, { rejectWithValue }) => {
     try {
-      await axiosInstance.delete(`/likes/${postId}/like`);
+      await axiosInstance.delete(`/likes/${postId}/like`, {
+        withCredentials: true
+      });
       return { postId };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
@@ -227,7 +231,9 @@ export const getLikesCount = createAsyncThunk(
   "likes/getLikesCount",
   async (postId, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get(`/likes/${postId}/likes`);
+      const res = await axiosInstance.get(`/likes/${postId}/likes`, {
+        withCredentials: true
+      });
       return { postId, count: res.data.likes };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
@@ -240,7 +246,9 @@ export const getUserLikeStatus = createAsyncThunk(
   "likes/getUserLikeStatus",
   async ({ postId }, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get(`/likes/${postId}/status`);
+      const res = await axiosInstance.get(`/likes/${postId}/status`, {
+        withCredentials: true
+      });
       return { postId, liked: res.data.liked };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
@@ -253,7 +261,9 @@ export const getLikesUsers = createAsyncThunk(
   'likes/getLikesUsers',
   async (postId, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get(`/likes/${postId}/users`);
+      const res = await axiosInstance.get(`/likes/${postId}/users`,{
+        withCredentials: true
+      });
       return { postId, users: res.data.users || [], count: res.data.count || 0 };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);

@@ -181,8 +181,8 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 // });
 
 export const logoutUser = asyncHandler(async (_req, res, _next) => {
-  // Clear the cookie properly for cross-domain
-  res.cookie('token', null, {
+  // Clear the cookie properly for cross-domain - jwt/token
+  res.cookie('jwt', null, {
     secure: process.env.NODE_ENV === 'production', // true in production
     httpOnly: true,
     sameSite: 'None', // important for cross-domain cookies

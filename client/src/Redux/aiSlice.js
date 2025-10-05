@@ -45,7 +45,9 @@ export const fetchAiInsights = createAsyncThunk(
   "ai/fetchAiInsights",
   async (data, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post("/ai/summary", { data });
+      const res = await axiosInstance.post("/ai/summary", { data }, {
+        withCredentials : true
+      });
       return res.data.summary;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch AI insights");

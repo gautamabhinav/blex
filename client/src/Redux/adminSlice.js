@@ -28,7 +28,9 @@ export const fetchUsers = createAsyncThunk(
       const endpoint =
         role === "SUPERADMIN" ? "/admin/users" : "/admin/users?filter=user";
 
-      const res = await axiosInstance.get(endpoint);
+      const res = await axiosInstance.get(endpoint, {
+        withCredentials : true
+      });
       return res.data.users;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -64,7 +66,9 @@ export const fetchUsers = createAsyncThunk(
 export const updateUserRole = createAsyncThunk(
   "admin/updateUserRole",
   async ({ userId, role }) => {
-    const res = await axiosInstance.put(`/admin/users/${userId}/role`, { role });
+    const res = await axiosInstance.put(`/admin/users/${userId}/role`, { role }, {
+      withCredentials : true
+    });
     toast.success(res.data.message);
     return res.data.user;
   }

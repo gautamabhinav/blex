@@ -376,6 +376,7 @@ export const uploadExcelFile = createAsyncThunk(
 
       const resPromise = axiosInstance.post("/excel", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true
       });
 
       await toast.promise(resPromise, {
@@ -399,7 +400,9 @@ export const getExcelFiles = createAsyncThunk(
   "excel/getAll",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get("/excel");
+      const res = await axiosInstance.get("/excel", {
+        withCredentials: true
+      });
       return Array.isArray(res.data.files) ? res.data.files : []; // ensure array
     } catch (err) {
       const message = err?.response?.data?.message || err.message;
@@ -416,7 +419,9 @@ export const getExcelFileById = createAsyncThunk(
   "excel/getById",
   async (id, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get(`/excel/${id}`);
+      const res = await axiosInstance.get(`/excel/${id}`,{
+        withCredentials: true
+      });
       return res.data.file;
     } catch (err) {
       const message = err?.response?.data?.message || err.message;
@@ -431,7 +436,9 @@ export const deleteExcelFile = createAsyncThunk(
   "excel/delete",
   async (id, { rejectWithValue }) => {
     try {
-      const resPromise = axiosInstance.delete(`/excel/${id}`);
+      const resPromise = axiosInstance.delete(`/excel/${id}`, {
+        withCredentials: true
+      });
       await toast.promise(resPromise, {
         loading: "Deleting...",
         success: "File deleted successfully",

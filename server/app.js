@@ -340,6 +340,9 @@ import errorMiddleware from "./src/middlewares/error.middleware.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// import session from "express-session";
+import MongoStore from "connect-mongo";
+
 // Init env
 config();
 const app = express();
@@ -354,6 +357,11 @@ app.use(express.urlencoded({ extended: true }));
 //   })
 // );
 
+
+
+
+
+app.set('trust proxy', 1);
 
 const allowedOrigins = [
   "http://localhost:5173", // local frontend
@@ -377,6 +385,38 @@ app.use(
 app.use(morgan("dev"));
 app.use(cookieParser());
 
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       sameSite: "none", // VERY IMPORTANT if frontend and backend are on different domains
+//       secure: true,     // true if using HTTPS, false if local
+//     },
+//   })
+// );
+
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI, // your MongoDB connection string
+      collectionName: "sessions",
+    }),
+    cookie: {
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    },
+  })
+);
+
+
 // File path setup (ESM-safe __dirname)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -397,6 +437,7 @@ import excelRoutes from "./src/routes/upload.routes.js";
 import summaryRoutes from "./src/routes/summary.routes.js";
 import commentRoutes from "./src/routes/comment.routes.js";
 import notificationRoutes from "./src/routes/notification.routes.js";
+import session from "express-session";
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/admin", adminRoutes);

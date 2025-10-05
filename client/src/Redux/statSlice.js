@@ -15,7 +15,9 @@ const initialState = {
 // function to get the stats data from backend
 export const getStatsData = createAsyncThunk("getstat", async () => {
   try {
-    const res = axiosInstance.get("/admin/stats/users");
+    const res = axiosInstance.get("/admin/stats/users" , data, {
+      withCredentials: true
+    });
     toast.promise(res, {
       loading: "Getting the stats...",
       success: (data) => {
@@ -33,7 +35,9 @@ export const getStatsData = createAsyncThunk("getstat", async () => {
 
 export const getTotals = createAsyncThunk("getTotals", async () => {
   try {
-    const res = await axiosInstance.get('/stats/totals');
+    const res = await axiosInstance.get('/stats/totals', {
+      withCredentials: true
+    });
     return res.data?.totals;
   } catch (err) {
     return { likes: 0, comments: 0, views: 0 };
