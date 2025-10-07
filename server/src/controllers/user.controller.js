@@ -18,7 +18,7 @@ import AppError from '../utils/AppError.js';
 
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // true in production
+  secure: process.env.NODE_ENV === "production" ? "true" : "Lax", // true in production
   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
@@ -183,11 +183,10 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 export const logoutUser = asyncHandler(async (_req, res, _next) => {
   // Clear the cookie properly for cross-domain - jwt/token
   res.cookie('jwt', null, {
-    secure: process.env.NODE_ENV === 'production', // true in production
+    secure: process.env.NODE_ENV === 'production' ? "true" : "Lax", // true in production
     httpOnly: true,
     sameSite: 'None', // important for cross-domain cookies
     maxAge: 0,
-    domain: '.xlblog-1.onrender.com', // optional, adjust to your domain
   });
 
   res.status(200).json({
