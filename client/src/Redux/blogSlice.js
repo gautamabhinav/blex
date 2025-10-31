@@ -82,11 +82,11 @@ export const getAllBlogs = createAsyncThunk("/blog/get", async () => {
     // console.log("API response:", res.data);
 
 
-    toast.promise(res, {
-      loading: "Loading blogs data...",
-      success: "blogs loaded successfully",
-      error: "Failed to get blogs",
-    });
+    // toast.promise(res, {
+    //   loading: "Loading blogs data...",
+    //   success: "blogs loaded successfully",
+    //   error: "Failed to get blogs",
+    // });
 
     const response = await res;
     // console.log("API response getall:", response.data);
@@ -119,11 +119,11 @@ export const createNewBlog = createAsyncThunk(
         withCredentials : true
       });
 
-      toast.promise(res, {
-        loading: "Creating the blog...",
-        success: "Blog created successfully",
-        error: "Failed to create blog",
-      });
+      // toast.promise(res, {
+      //   loading: "Creating the blog...",
+      //   success: "Blog created successfully",
+      //   error: "Failed to create blog",
+      // });
 
       
       const response = await res;
@@ -177,11 +177,11 @@ export const deleteBlog = createAsyncThunk("/blog/delete", async (id) => {
       withCredentials : true
     });
 
-    toast.promise(res, {
-      loading: "Deleting the blog...",
-      success: "Blog deleted successfully",
-      error: "Failed to delete blog",
-    });
+    // toast.promise(res, {
+    //   loading: "Deleting the blog...",
+    //   success: "Blog deleted successfully",
+    //   error: "Failed to delete blog",
+    // });
 
     const response = await res;
 
@@ -220,11 +220,11 @@ export const updateBlog = createAsyncThunk("/blog/update", async (data) => {
 
     });
 
-    toast.promise(res, {
-      loading: "Updating the blog...",
-      success: "Blog updated successfully",
-      error: "Failed to update blog",
-    });
+    // toast.promise(res, {
+    //   loading: "Updating the blog...",
+    //   success: "Blog updated successfully",
+    //   error: "Failed to update blog",
+    // });
 
     const response = await res;
     //  console.log("API response update:", response.data);
