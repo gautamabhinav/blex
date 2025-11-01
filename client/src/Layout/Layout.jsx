@@ -281,21 +281,21 @@ const Layout = ({ children }) => {
           icon: <FiUser />,
           desc: "Manage site content",
         },
-        // {
-        //   name: "Excel Manager",
-        //   path: "/excel",
-        //   icon: <FiFileText />, // or FiDatabase / FiUpload
-        //   desc: "Upload & manage Excel files",
-        // },
-      ]
-    : []),
-  // { name: "All Blogs", path: "/blogs", icon: <FiBook />, desc: "Explore all posts" },
-  {
+        {
           name: "Excel Manager",
           path: "/excel",
           icon: <FiFileText />, // or FiDatabase / FiUpload
           desc: "Upload & manage Excel files",
         },
+      ]
+    : []),
+  { name: "All Blogs", path: "/blogs", icon: <FiBook />, desc: "Explore all posts" },
+  // {
+  //         name: "Excel Manager",
+  //         path: "/excel",
+  //         icon: <FiFileText />, // or FiDatabase / FiUpload
+  //         desc: "Upload & manage Excel files",
+  //       },
 
   // { name: "User Dashboard", path: "/user/dashboard", icon: <FiBook />, desc: "User Dashboard" },
   { name: "Contact Us", path: "/contact", icon: <FiPhone />, desc: "Get in touch" },
@@ -335,12 +335,12 @@ const Layout = ({ children }) => {
           </button>
 
           <Link to="/" className="text-lg font-bold tracking-wide hover:opacity-90">
-            Excel Analytics Platform
+            Excel Analytics Blogging Platform 
           </Link>
         </div>
 
         {/* search - visible on md+ */}
-        {/* <form onSubmit={submitSearch} className="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-6">
+        <form onSubmit={submitSearch} className="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-6">
           <div className="relative w-full">
             <AiOutlineSearch className="absolute left-3 top-3 text-gray-300" />
             <input
@@ -352,7 +352,7 @@ const Layout = ({ children }) => {
             />
           </div>
           <button type="submit" className="bg-yellow-400 text-black px-4 py-2 rounded-full font-semibold">Search</button>
-        </form> */}
+        </form>
 
         <div className="flex items-center gap-3">
           <button onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition" title="Toggle theme">
